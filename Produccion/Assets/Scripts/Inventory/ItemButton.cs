@@ -9,7 +9,7 @@ public class ItemButton : MonoBehaviour
     
     public void Press()
     {
-        if(BattleManager.instance.itemsToUseMenu.activeInHierarchy)
+        if(BattleManager.instance.isBattleActive && BattleManager.instance.battleView.itemsToUseMenu.activeInHierarchy)
         {
             BattleManager.instance.SelectedItemToUse(itemOnButton);
         }

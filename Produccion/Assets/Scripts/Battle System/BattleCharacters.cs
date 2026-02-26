@@ -5,7 +5,7 @@ using UnityEngine;
 public class BattleCharacters : MonoBehaviour
 {
     [SerializeField] bool isPlayer;
-    [SerializeField] public string[] attacksAvailable;
+    [SerializeField] public AttackType[] availableAttacks;
 
     public string characterName;
     public int currentHP, maxHP, dexterity, strength, defence, meleeWeaponDamage, rangeWeaponDamage;
@@ -25,9 +25,9 @@ public class BattleCharacters : MonoBehaviour
         return isPlayer;
     }
 
-    public string[] AttackMovesAvailable()
+    public AttackType[] AttackMovesAvailable()
     {
-        return attacksAvailable;
+        return availableAttacks;
     }
 
     /*public void TakeHPMeleeDamage(int meleeDamageToReceive)

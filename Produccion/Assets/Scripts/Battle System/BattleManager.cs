@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class BattleManager : MonoBehaviour
 {
@@ -11,11 +9,17 @@ public class BattleManager : MonoBehaviour
     public bool isBattleActive;
     bool inventoryIsOpen;
 
+    [Header("Dependencies")]
+    [SerializeField] public BattleView battleView;
+    private CombatSystem combatSystem;
+
+    [Header("Scene References")]
     [SerializeField] GameObject battleScene;
     public Camera battleCamera;
     public AudioListener battleAudioListener;
     public Camera worldCamera;
     public AudioListener worldAudioListener;
+    
     [SerializeField] List<BattleCharacters> activeCharacters = new List<BattleCharacters>();
     [SerializeField] GameObject lastEnemy;
     [SerializeField] GameObject enemyGO;
@@ -32,31 +36,10 @@ public class BattleManager : MonoBehaviour
 
     [SerializeField] BattleMoves[] battleMovesList;
 
-    [SerializeField] GameObject[] playerBattleStats;
-    [SerializeField] Text[] playersNameText;
-    [SerializeField] Slider[] playerHealthSlider;
-
-    [SerializeField] GameObject[] enemyBattleStats;
-    [SerializeField] Text[] enemysNameText;
-    [SerializeField] Slider[] enemyHealthSlider;
-
     [SerializeField] float chanceToRunAway = 0.5f;
-    public GameObject itemsToUseMenu;
     [SerializeField] ItemsManager selectedItem;
-    [SerializeField] GameObject itemSlotContainer;
-    [SerializeField] Transform itemSlotContainerParent;
-    [SerializeField] Text itemName, itemDescriptionText;
-    [SerializeField] GameObject itemDescription;
-
-    [SerializeField] TextMeshProUGUI damageReceived;
-    [SerializeField] TextMeshProUGUI damageDealt;
-
-    [SerializeField] Text amountOfAmmo;
-
-    [SerializeField] TextMeshProUGUI log;
 
     private int amountOfXp;
-    private int ammoRewards;
 
     public bool allEnemiesAreDead = true;
     public bool allPlayersAreDead = true;
@@ -68,13 +51,9 @@ public class BattleManager : MonoBehaviour
     public event EventHandler OnBattleEnd;
 
     AudioSource combatSong;
-
     RandomBattle randomCombat;
     float lastRandomBattle;
     [SerializeField] float inmunityTime;
-
-    [SerializeField] FeedbackAfterCombat rewardsTexts;
-
 
     void Awake()
     {
@@ -87,6 +66,8 @@ public class BattleManager : MonoBehaviour
             instance = this;
         }
         DontDestroyOnLoad(gameObject);
+        
+        combatSystem = new CombatSystem();
     }
 
     private void Start()
@@ -101,33 +82,6 @@ public class BattleManager : MonoBehaviour
     void Update()
     {
         CheckPlayerButtonHolder();
-
-        if (PlayerStats.instance.equipedRangeWeapon != null)
-        {
-            Debug.Log(PlayerStats.instance.equipedRangeWeapon.itemName);
-            switch (PlayerStats.instance.equipedRangeWeapon.itemName)
-            {
-                case "Escopeta":
-                    if (Inventory.instance.shotgunAmmo > 0)
-                        Inventory.instance.hasAmmo = true;
-                    else Inventory.instance.hasAmmo = false;
-                    amountOfAmmo.text = Inventory.instance.shotgunAmmo.ToString();                    
-                    break;
-                case "Subfusil":
-                    if (Inventory.instance.SMGAmmo > 0)
-                        Inventory.instance.hasAmmo = true;
-                    else Inventory.instance.hasAmmo = false;
-                    amountOfAmmo.text = Inventory.instance.SMGAmmo.ToString();
-                    break;
-                case "Pistola":
-                    if (Inventory.instance.pistolAmmo > 0)
-                        Inventory.instance.hasAmmo = true;
-                    else Inventory.instance.hasAmmo = false;
-                    amountOfAmmo.text = Inventory.instance.pistolAmmo.ToString();
-                    break;
-            }
-        }
-
     }
 
     private void CheckPlayerButtonHolder()
@@ -151,7 +105,6 @@ public class BattleManager : MonoBehaviour
 
     public void StartBattle(GameObject enemy, string enemiesToSpawn, bool isDinniesBAttle, bool isRandomBattle, bool isBossBattle)
     {
-        Debug.Log("Batalla!");
         randomBattle = isRandomBattle;
         dinniesBattle = isDinniesBAttle;
         bossBattle = isBossBattle;
@@ -161,30 +114,35 @@ public class BattleManager : MonoBehaviour
             if (Time.time >= lastRandomBattle + inmunityTime)
                 randomCombat = enemy.GetComponent<RandomBattle>();
             else
-            {
-                Debug.Log("Combate evitado");
                 return;
-            }
         }
+        
         Destroy(lastEnemy);
         if (enemy != null)
         {
             enemyGO = enemy;
             enemyCollider = enemyGO.GetComponent<Collider2D>();
         }
-        log.text = string.Empty;
+
+        StartCoroutine(battleView.ShowLog(string.Empty));
 
         if (!isBattleActive)
         {
             SettingUpBattle();
             AddingPlayers();
             AddingEnemies(enemiesToSpawn);
-            UpdatePlayerStats();
-            UpdateEnemyStats();
-
+            
+            battleView.UpdatePlayerStats(activeCharacters);
+            battleView.UpdateEnemyStats(activeCharacters);
+            
+            if (activeCharacters.Count > 0 && activeCharacters[0].IsPlayer())
+            {
+                CheckAmmoStatus(activeCharacters[0].equipedRangeWeapon);
+                battleView.UpdateAmmo(activeCharacters[0].equipedRangeWeapon);
+            }
 
             waitingForTurn = true;
-            currentTurn = 0;//Random.Range(0, activeCharacters.Count);
+            currentTurn = 0;
         }
         GameManager.instance.player.SetActive(false);
     }
@@ -214,6 +172,7 @@ public class BattleManager : MonoBehaviour
     {
         if (activeCharacters.Count > 0)
             Destroy(activeCharacters[0].gameObject);
+            
         for (int i = 0; i < GameManager.instance.GetPlayerStats().Length; i++)
         {
             if (GameManager.instance.GetPlayerStats()[i].gameObject.activeInHierarchy)
@@ -259,7 +218,6 @@ public class BattleManager : MonoBehaviour
         if (i == 0 && player.equipedRangeWeapon != null)
         {
             activeCharacters[i].equipedRangeWeapon = player.equipedRangeWeapon;
-            Debug.Log(player.equipedRangeWeapon.itemName + " equipada");
         }
     }
 
@@ -295,8 +253,8 @@ public class BattleManager : MonoBehaviour
 
         waitingForTurn = true;
         UpdateBattle();
-        UpdatePlayerStats();
-        UpdateEnemyStats();
+        battleView.UpdatePlayerStats(activeCharacters);
+        battleView.UpdateEnemyStats(activeCharacters);
     }
 
     private void UpdateBattle()
@@ -321,7 +279,6 @@ public class BattleManager : MonoBehaviour
             {
                 if (activeCharacters[i].IsPlayer())
                     allPlayersAreDead = false;
-
                 else
                     allEnemiesAreDead = false;
             }
@@ -330,27 +287,26 @@ public class BattleManager : MonoBehaviour
         if (allEnemiesAreDead || allPlayersAreDead)
         {
             GameManager.instance.player.SetActive(true);
-            //enemyGO.SetActive(true);
 
             if (allEnemiesAreDead)
             {
                 PlayerStats.instance.AddXP(amountOfXp);
                 MenuManager.instance.AddCreditsUI();
                 Inventory.instance.pistolAmmo += ammoRewards;
-                StartCoroutine(rewardsTexts.ShowAmmoRewards(ammoRewards.ToString()));
+                StartCoroutine(battleView.rewardsTexts.ShowAmmoRewards(ammoRewards.ToString()));
                 ExportPlayerStats(0);
-                if (!randomBattle)   Destroy(enemyGO);
-                Debug.Log("Victoria!");
-                  if (randomBattle || dinniesBattle)
+                if (!randomBattle) Destroy(enemyGO);
+                
+                if (randomBattle || dinniesBattle)
                     OnBattleEnd?.Invoke(this, EventArgs.Empty);
+                    
                 if(bossBattle)
-                    StartCoroutine(rewardsTexts.ShowLifeRestored());
+                    StartCoroutine(battleView.rewardsTexts.ShowLifeRestored());
             }
             else if (allPlayersAreDead)
             {
                 ExportPlayerStats(0);
                 GameManager.instance.RespawnPlayer();
-                Debug.Log("Derrota...");
             }
 
             EndBattle();
@@ -381,46 +337,34 @@ public class BattleManager : MonoBehaviour
 
     private void EnemyAttack()
     {
-        StartCoroutine(Shake(activeCharacters[0].GetComponent<Rigidbody2D>()));
-        List<int> players = new List<int>();
+        StartCoroutine(battleView.Shake(activeCharacters[0].GetComponent<Rigidbody2D>()));
+        
+        int selectedPlayerToAttack = combatSystem.SelectRandomPlayerTarget(activeCharacters);
+        if (selectedPlayerToAttack == -1) return;
 
-        for (int n = 0; n < activeCharacters.Count; n++)
-        {
-            if (activeCharacters[n].IsPlayer() && activeCharacters[n].currentHP > 0)
-            {
-                players.Add(n);
-            }
-        }
-        int selectedPlayerToAttack = players[UnityEngine.Random.Range(0, players.Count)];
+        AttackType attackType = combatSystem.DecideEnemyAttack(activeCharacters[currentTurn]);
 
-        if (activeCharacters[currentTurn].attacksAvailable.Length == 3)
+        switch (attackType)
         {
-            int n = UnityEngine.Random.Range(1, 10);
-            Debug.Log(n);
-            if (n == 9) Heal();
-            else if (n >= 5) DealRangeDamageToCharacters(selectedPlayerToAttack);
-            else DealMeleeDamageToCharacters(selectedPlayerToAttack);
-        }
-        if (activeCharacters[currentTurn].attacksAvailable.Length == 2)
-        {
-            int i = UnityEngine.Random.Range(1, 10);
-            if (i <= 5) DealRangeDamageToCharacters(selectedPlayerToAttack);
-            else DealMeleeDamageToCharacters(selectedPlayerToAttack);
-        }
-        if (activeCharacters[currentTurn].attacksAvailable.Length == 1)
-        {
-            if (activeCharacters[currentTurn].attacksAvailable[0] == "Ataque melee") DealMeleeDamageToCharacters(selectedPlayerToAttack);
-            else if (activeCharacters[currentTurn].attacksAvailable[0] == "Ataque rango") DealRangeDamageToCharacters(selectedPlayerToAttack);
+            case AttackType.Heal:
+                Heal();
+                break;
+            case AttackType.Range:
+                DealRangeDamageToCharacters(selectedPlayerToAttack);
+                break;
+            case AttackType.Melee:
+                DealMeleeDamageToCharacters(selectedPlayerToAttack);
+                break;
         }
 
-        UpdatePlayerStats();
+        battleView.UpdatePlayerStats(activeCharacters);
     }
 
     public void PlayerRangeAttack()
     {
-        StartCoroutine(Shake(activeCharacters[1].GetComponent<Rigidbody2D>()));
-        Debug.Log("AtaqueRango");
+        StartCoroutine(battleView.Shake(activeCharacters[1].GetComponent<Rigidbody2D>()));
         DealRangeDamageToCharacters(1);
+        
         switch (activeCharacters[0].equipedRangeWeapon.itemName)
         {
             case "Pistola":
@@ -432,10 +376,10 @@ public class BattleManager : MonoBehaviour
             case "Escopeta":
                 Inventory.instance.shotgunAmmo--;
                 break;
-            default:
-                Debug.Log("No weapon equiped");
-                break;
         }
+        
+        CheckAmmoStatus(activeCharacters[0].equipedRangeWeapon);
+        battleView.UpdateAmmo(activeCharacters[0].equipedRangeWeapon);
         AudioManager.instance.selectRangeAttackSFX(activeCharacters[0].equipedRangeWeapon);
 
         NextTurn();
@@ -443,252 +387,144 @@ public class BattleManager : MonoBehaviour
 
     public void PlayerMeleeAttack()
     {
-        StartCoroutine(Shake(activeCharacters[1].GetComponent<Rigidbody2D>()));
-        Debug.Log("AtaqueMelee");
+        StartCoroutine(battleView.Shake(activeCharacters[1].GetComponent<Rigidbody2D>()));
         DealMeleeDamageToCharacters(1);
 
-        if (activeCharacters[0].equipedRangeWeapon == null) AudioManager.instance.SelectMeleeAttackSFX(null);
-        else AudioManager.instance.SelectMeleeAttackSFX(activeCharacters[0].equipedMeleeWeapon);
+        if (activeCharacters[0].equipedRangeWeapon == null) 
+            AudioManager.instance.SelectMeleeAttackSFX(null);
+        else 
+            AudioManager.instance.SelectMeleeAttackSFX(activeCharacters[0].equipedMeleeWeapon);
 
         NextTurn();
     }
 
     private void DealRangeDamageToCharacters(int selectedCharacterToAttack)
     {
-        float attackPower = activeCharacters[currentTurn].dexterity + activeCharacters[currentTurn].rangeWeaponDamage;
-        float defenceAmount = activeCharacters[selectedCharacterToAttack].defence;
-        float damageAmount = (attackPower - defenceAmount) * UnityEngine.Random.Range(0.8f, 1.2f);
+        int damageToGive = combatSystem.CalculateRangeDamage(activeCharacters[currentTurn], activeCharacters[selectedCharacterToAttack]);
+        
+        string attackerName = activeCharacters[currentTurn].characterName;
+        string defenderName = activeCharacters[selectedCharacterToAttack].characterName;
 
-        int damageToGive = (int)damageAmount;
-        if (damageToGive <= 0)
-            damageToGive = 0;
+        StartCoroutine(battleView.ShowLog($"{attackerName} usa ataque a rango y causa {damageToGive} de dano a {defenderName}"));
 
-        //iguala el valor del da�o a critico si es necesario
-        damageToGive = CalculateCritical(damageToGive);
-        Debug.Log(activeCharacters[currentTurn].characterName + " usa ataque a rango y causa " + (int)damageAmount + " de dano a " + activeCharacters[selectedCharacterToAttack].characterName);
-        StartCoroutine(UpdateLog(activeCharacters[currentTurn].characterName + " usa ataque a rango y causa " + (int)damageAmount + " de dano a " + activeCharacters[selectedCharacterToAttack].characterName));
-
-        StartCoroutine(ShowEffect(damageToGive, false));
+        bool isPlayerAttacking = currentTurn == 0;
+        StartCoroutine(battleView.ShowDamageEffect(damageToGive, false, isPlayerAttacking));
+        
         activeCharacters[selectedCharacterToAttack].TakeHPDamage(damageToGive);
     }
 
     private void DealMeleeDamageToCharacters(int selectedCharacterToAttack)
     {
-        float attackPower = activeCharacters[currentTurn].strength + activeCharacters[currentTurn].meleeWeaponDamage;
-        float defenceAmount = activeCharacters[selectedCharacterToAttack].defence;
-        float damageAmount = (attackPower - defenceAmount) * UnityEngine.Random.Range(0.8f, 1.2f);
+        int damageToGive = combatSystem.CalculateMeleeDamage(activeCharacters[currentTurn], activeCharacters[selectedCharacterToAttack]);
 
-        int damageToGive = (int)damageAmount;
-        if (damageToGive <= 0)
-            damageToGive = 0;
-        Debug.Log(activeCharacters[currentTurn].characterName + " usa ataque melee y causa " + (int)damageAmount + " de dano a " + activeCharacters[selectedCharacterToAttack].characterName);
-        StartCoroutine(UpdateLog(activeCharacters[currentTurn].characterName + " usa ataque melee y causa " + (int)damageAmount + " de dano a " + activeCharacters[selectedCharacterToAttack].characterName));
+        string attackerName = activeCharacters[currentTurn].characterName;
+        string defenderName = activeCharacters[selectedCharacterToAttack].characterName;
 
-        StartCoroutine(ShowEffect(damageToGive, false));
+        StartCoroutine(battleView.ShowLog($"{attackerName} usa ataque melee y causa {damageToGive} de dano a {defenderName}"));
+
+        bool isPlayerAttacking = currentTurn == 0;
+        StartCoroutine(battleView.ShowDamageEffect(damageToGive, false, isPlayerAttacking));
+        
         activeCharacters[selectedCharacterToAttack].TakeHPDamage(damageToGive);
-    }
-
-    private int CalculateCritical(int damageToGive)
-    {
-        if (UnityEngine.Random.value <= 0.1f)// si es critico multiplica x2
-        {
-            Debug.Log("Golpe crítico! En lugar de " + damageToGive + " puntos, " + (damageToGive * 2));
-            StartCoroutine(UpdateLog("Golpe crítico! en lugar de " + damageToGive + " puntos, " + (damageToGive * 2)));
-
-            return (damageToGive * 2);
-        }
-
-        // sino hace el daño normal
-        return damageToGive;
     }
 
     private void Heal()
     {
         activeCharacters[currentTurn].AddHP(50);
-        StartCoroutine(UpdateLog(activeCharacters[currentTurn].name + " se cura 50 puntos de vida."));
-        StartCoroutine(ShowEffect(50, true));
-        Debug.Log("Heal");
-    }
-
-    private void UpdatePlayerStats()
-    {
-        for (int i = 0; i < playersNameText.Length; i++)
-        {
-            if (activeCharacters.Count > i)
-            {
-                if (activeCharacters[i].IsPlayer())
-                {
-                    BattleCharacters playerData = activeCharacters[0];
-
-                    playersNameText[i].text = playerData.characterName;
-
-                    playerHealthSlider[i].maxValue = playerData.maxHP;
-                    playerHealthSlider[i].value = playerData.currentHP;
-
-                    PlayerStats player = GameManager.instance.GetPlayerStats()[i];
-                    activeCharacters[i].meleeWeaponDamage = player.meleeDamage;
-                    activeCharacters[i].rangeWeaponDamage = player.rangeDamage;
-                    activeCharacters[i].equipedRangeWeapon = player.equipedRangeWeapon;
-                    activeCharacters[i].equipedMeleeWeapon = player.equipedMeleeWeapon;
-                }
-                else
-                {
-                    playerBattleStats[i].SetActive(false);
-                }
-            }
-            else
-            {
-                playerBattleStats[i].SetActive(false);
-            }
-        }
-    }
-
-    private void UpdateEnemyStats()
-    {
-        for (int i = 0; i < enemysNameText.Length; i++)
-        {
-            if (activeCharacters.Count > i)
-            {
-                BattleCharacters enemyData = activeCharacters[1];
-
-                enemysNameText[i].text = enemyData.characterName;
-
-                enemyHealthSlider[i].maxValue = enemyData.maxHP;
-                enemyHealthSlider[i].value = enemyData.currentHP;
-            }
-            else
-            {
-                enemyBattleStats[i].SetActive(false);
-            }
-        }
+        StartCoroutine(battleView.ShowLog($"{activeCharacters[currentTurn].name} se cura 50 puntos de vida."));
+        
+        bool isPlayerAttacking = currentTurn == 0;
+        StartCoroutine(battleView.ShowDamageEffect(50, true, isPlayerAttacking));
     }
 
     public void RunAway()
     {
-        //enemyGO.SetActive(true);
         if (UnityEngine.Random.value > chanceToRunAway)
         {
-            //Hay 50% de chances de no poder escapar y perdes el turno
-            Debug.Log("Huir");
             NextTurn();
-            //waitingForTurn = true;
             StartCoroutine(ScapingTime());
             if(randomBattle || dinniesBattle)
                 OnBattleEnd?.Invoke(this, EventArgs.Empty);
         }
         else
         {
-            StartCoroutine(UpdateLog("Intentas escapar pero fallas."));
+            StartCoroutine(battleView.ShowLog("Intentas escapar pero fallas."));
             NextTurn();
         }
         ExportPlayerStats(0);
-
     }
 
     public void UpdateItemsInInventory()
     {
         if (!inventoryIsOpen && isBattleActive)
-            itemsToUseMenu.SetActive(true);
+            battleView.ShowItemsMenu(true);
+            
         inventoryIsOpen = !inventoryIsOpen;
-
-        foreach (Transform itemSlot in itemSlotContainerParent)
-        {
-            Destroy(itemSlot.gameObject);
-        }
+        
+        battleView.ClearItemsMenu();
 
         foreach (ItemsManager item in Inventory.instance.GetItemsList())
         {
-            RectTransform itemSlot = Instantiate(itemSlotContainer, itemSlotContainerParent).GetComponent<RectTransform>();
-
-            Image itemImage = itemSlot.Find("Item image").GetComponent<Image>();
-            itemImage.sprite = item.icon;
-
-            Text itemsAmountText = itemSlot.Find("Amount Text").GetComponent<Text>();
-            if (item.amount > 1)
-                itemsAmountText.text = item.amount.ToString();
-            else
-                itemsAmountText.text = "";
-
-            itemSlot.GetComponent<ItemButton>().itemOnButton = item;
+            battleView.CreateItemButton(item);
         }
     }
 
     public void SelectedItemToUse(ItemsManager itemToUse)
     {
         selectedItem = itemToUse;
-        itemName.text = itemToUse.itemName;
-        itemDescriptionText.text = itemToUse.itemDescription;
-        itemDescription.SetActive(true);
+        battleView.SelectItem(itemToUse);
     }
 
     public void UseItemButton(int selectedPlayer)
     {
         activeCharacters[selectedPlayer].UseItemInBattle(selectedItem);
         Inventory.instance.RemoveItem(selectedItem);
-        StartCoroutine(UpdateLog(activeCharacters[currentTurn].characterName + " usa " + selectedItem.name + " y se cura " + selectedItem.amountOfAffect + " puntos de vida."));
-        StartCoroutine(ShowEffect(selectedItem.amountOfAffect, true));
-        UpdatePlayerStats();
+        
+        StartCoroutine(battleView.ShowLog($"{activeCharacters[currentTurn].characterName} usa {selectedItem.name} y se cura {selectedItem.amountOfAffect} puntos de vida."));
+        
+        bool isPlayerAttacking = currentTurn == 0;
+        StartCoroutine(battleView.ShowDamageEffect(selectedItem.amountOfAffect, true, isPlayerAttacking));
+        
+        battleView.UpdatePlayerStats(activeCharacters);
         UpdateItemsInInventory();
-        itemsToUseMenu.SetActive(false);
+        battleView.ShowItemsMenu(false);
+        
+        if (activeCharacters[0].IsPlayer())
+        {
+            CheckAmmoStatus(activeCharacters[0].equipedRangeWeapon);
+            battleView.UpdateAmmo(activeCharacters[0].equipedRangeWeapon);
+        }
+
         NextTurn();
     }
 
-    IEnumerator ShowEffect(int damage, bool healing)
+    private void CheckAmmoStatus(ItemsManager equipedRangeWeapon)
     {
-        if(!healing)
+        if (equipedRangeWeapon != null)
         {
-            damageDealt.color = Color.red;
-            damageReceived.color = Color.red;
-            if (currentTurn == 0)
+            switch (equipedRangeWeapon.itemName)
             {
-                damageDealt.text = "-" + damage.ToString();
-                yield return new WaitForSeconds(5f);
-                damageDealt.text = string.Empty;
-            }
-            else if (currentTurn == 1)
-            {
-                damageReceived.text = "-" + damage.ToString();
-                yield return new WaitForSeconds(5f);
-                damageReceived.text = string.Empty;
+                case "Escopeta":
+                    Inventory.instance.hasAmmo = Inventory.instance.shotgunAmmo > 0;
+                    break;
+                case "Subfusil":
+                    Inventory.instance.hasAmmo = Inventory.instance.SMGAmmo > 0;
+                    break;
+                case "Pistola":
+                    Inventory.instance.hasAmmo = Inventory.instance.pistolAmmo > 0;
+                    break;
             }
         }
         else
         {
-            damageDealt.color = Color.green;
-            damageReceived.color = Color.green;
-            if (currentTurn == 1)
-            {
-                damageDealt.text = "+" + damage.ToString();
-                yield return new WaitForSeconds(5f);
-                damageDealt.text = string.Empty;
-            }
-            else if (currentTurn == 0)
-            {
-                damageReceived.text = "+" + damage.ToString();
-                yield return new WaitForSeconds(5f);
-                damageReceived.text = string.Empty;
-            }
+            Inventory.instance.hasAmmo = false;
         }
-
-    }
-
-    IEnumerator UpdateLog(string newText)
-    {
-        log.text = string.Empty;
-        log.text += newText;
-        //if (log.isTextOverflowing)
-        //{
-        //    Debug.Log("Overflowing");
-        //    log.text = string.Empty;
-        //    log.text += newText;
-        //}
-        yield return new WaitForSeconds(2f);
     }
 
     IEnumerator ScapingTime()
     {
-        if (!randomBattle)  enemyCollider.enabled = false;
-        StartCoroutine(UpdateLog("Intentas escapar y lo logras."));
+        if (!randomBattle) enemyCollider.enabled = false;
+        StartCoroutine(battleView.ShowLog("Intentas escapar y lo logras."));
         yield return new WaitForSeconds(2f);
         EndBattle();
         yield return new WaitForSeconds(3f);
@@ -707,30 +543,11 @@ public class BattleManager : MonoBehaviour
         battleScene.SetActive(false);
         if (randomBattle)
         {
-            Debug.Log(lastRandomBattle);
             lastRandomBattle = Time.time;
             StartCoroutine(randomCombat.Inmunity());
         }        
         combatSong.Stop();
         combatSong.clip = MusicManager.instance.activeClip;
         combatSong.Play();
-    }
-
-    public IEnumerator Shake(Rigidbody2D rb)
-    {
-        Vector2 originalPos = rb.position;
-        int directionX;
-        int directionY;
-
-        for (int i = 0; i < 5; i++)
-        {
-            directionY = UnityEngine.Random.Range(-1, 2);
-            directionX = UnityEngine.Random.Range(-1, 2);
-
-            rb.velocity = new Vector2(directionX, directionY) * 10;
-            yield return new WaitForSeconds(0.05f);
-            rb.velocity = Vector2.zero;
-            rb.position = originalPos;
-        }
     }
 }

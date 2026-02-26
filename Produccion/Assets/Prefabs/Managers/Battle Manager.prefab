@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 116928167587642210}
   - component: {fileID: 116928167587642211}
+  - component: {fileID: 8772154347454186458}
   m_Layer: 12
   m_Name: Battle Manager
   m_TagString: Untagged
@@ -46,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isBattleActive: 0
+  battleView: {fileID: 8772154347454186458}
   battleScene: {fileID: 116928169104389185}
   battleCamera: {fileID: 403158077764045675}
   battleAudioListener: {fileID: 0}
@@ -79,6 +81,26 @@ MonoBehaviour:
     movePower: 15
   - moveName: Ataque rango
     movePower: 15
+  chanceToRunAway: 0.5
+  selectedItem: {fileID: 0}
+  allEnemiesAreDead: 1
+  allPlayersAreDead: 1
+  randomBattle: 0
+  dinniesBattle: 0
+  bossBattle: 0
+  inmunityTime: 10
+--- !u!114 &8772154347454186458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116928167587642220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b1365b502d343c4dbe934400236b95d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   playerBattleStats:
   - {fileID: 116928168767275211}
   playersNameText:
@@ -91,24 +113,16 @@ MonoBehaviour:
   - {fileID: 7359744472911340612}
   enemyHealthSlider:
   - {fileID: 5334868204532326367}
-  chanceToRunAway: 0.5
   itemsToUseMenu: {fileID: 116928169597965960}
-  selectedItem: {fileID: 0}
-  itemSlotContainer: {fileID: 6417986064933402972, guid: 62d910fb69030834a8442286558d2d6d, type: 3}
+  itemSlotContainerPrefab: {fileID: 3747405986437377227}
   itemSlotContainerParent: {fileID: 116928167705865247}
   itemName: {fileID: 116928168833973808}
   itemDescriptionText: {fileID: 116928168967730632}
   itemDescription: {fileID: 116928168192207245}
   damageReceived: {fileID: 6607566565194583737}
   damageDealt: {fileID: 7113254807630270880}
-  amountOfAmmo: {fileID: 8272503577964483511}
   log: {fileID: 7816298543029630632}
-  allEnemiesAreDead: 1
-  allPlayersAreDead: 1
-  randomBattle: 0
-  dinniesBattle: 0
-  bossBattle: 0
-  inmunityTime: 10
+  amountOfAmmo: {fileID: 8272503577964483511}
   rewardsTexts: {fileID: 0}
 --- !u!1 &116928167659591806
 GameObject:
@@ -1678,7 +1692,7 @@ GameObject:
   - component: {fileID: 116928169482471943}
   - component: {fileID: 116928169482471942}
   m_Layer: 12
-  m_Name: Health Slider
+  m_Name: Player Health Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3199,7 +3213,7 @@ GameObject:
   - component: {fileID: 2181992642589560183}
   - component: {fileID: 5334868204532326367}
   m_Layer: 12
-  m_Name: Health Slider
+  m_Name: Enemy Health Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3859,6 +3873,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 62d910fb69030834a8442286558d2d6d, type: 3}
+--- !u!1 &3747405986437377227 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6417986064933402972, guid: 62d910fb69030834a8442286558d2d6d, type: 3}
+  m_PrefabInstance: {fileID: 7858835988976932247}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &5014083606902182061 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2919928809581249850, guid: 62d910fb69030834a8442286558d2d6d, type: 3}
