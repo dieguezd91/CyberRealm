@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class BattleManager : MonoBehaviour
 {
@@ -48,10 +47,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private bool allPlayersAreDead = true;
 
     [SerializeField] private bool randomBattle;
-    
-    [FormerlySerializedAs("dinniesBattle")]
     [SerializeField] private bool isDinnieBattle;
-    
     [SerializeField] private bool bossBattle;
 
     public event EventHandler OnBattleEnd;

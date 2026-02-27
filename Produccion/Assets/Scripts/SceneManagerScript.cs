@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 public class SceneManagerScript : MonoBehaviour
 {
     public static SceneManagerScript instance;
-    
-    [FormerlySerializedAs("scene")]
     [SerializeField] private string currentScene;
 
     [SerializeField] private Vector2 spawnpoint;
@@ -26,11 +23,6 @@ public class SceneManagerScript : MonoBehaviour
         else
         {
             instance = this;
-        }
-
-        if (string.IsNullOrEmpty(currentScene))
-        {
-            currentScene = SceneManager.GetActiveScene().name;
         }
     }
 

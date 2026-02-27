@@ -3,14 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class QuestManager : MonoBehaviour
 {
     [SerializeField] private string[] questNames;
     [SerializeField] private string[] questDescriptions;
-    
-    [FormerlySerializedAs("questCompleted")]
     [SerializeField] private bool[] completedQuests;
 
     public static QuestManager instance;
