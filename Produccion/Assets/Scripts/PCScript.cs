@@ -14,13 +14,13 @@ public class PCScript : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space) && !MissionPanelUI.activeInHierarchy)
             {
-                lastSpeed = PlayerController.instance.MoveSpeed;
-                PlayerController.instance.MoveSpeed = 0;
+                lastSpeed = PlayerController.instance.moveSpeed;
+                PlayerController.instance.moveSpeed = 0;
                 MissionPanelUI.SetActive(true);
             }
             else if (Input.GetKeyDown(KeyCode.Escape) && MissionPanelUI.activeInHierarchy)
             {
-                PlayerController.instance.MoveSpeed = lastSpeed;
+                PlayerController.instance.moveSpeed = lastSpeed;
                 MissionPanelUI.SetActive(false);
             }
         }

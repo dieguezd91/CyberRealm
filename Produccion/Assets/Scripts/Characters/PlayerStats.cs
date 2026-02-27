@@ -1,57 +1,39 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class PlayerStats : MonoBehaviour
 {
     public static PlayerStats instance;
 
-    [SerializeField] private string playerName;
-    [SerializeField] private Sprite characterImage;
+    [SerializeField] public string playerName;
+    [SerializeField] public Sprite characterImage;
 
-    [SerializeField] private int playerLevel = 1;
-    [SerializeField] private int maxLevel = 50;
-    [SerializeField] private int currentXp;
-    [SerializeField] private int[] xpForNextLevel;
-    [SerializeField] private int baseLevelXp = 100;
-    [SerializeField] private GameObject levelUp;
+    [SerializeField] public int playerLevel = 1;
+    [SerializeField] public int maxLevel = 50;
+    [SerializeField] public int currentXP;
+    [SerializeField] public int[] xpForNextLevel;
+    [SerializeField] public int baseLevelXP = 100;
+    public GameObject levelUp;
 
-    [SerializeField] private int maxHealth = 100;
-    [SerializeField] private int currentHealth;
+    [SerializeField] public int maxHP = 100;
+    [SerializeField] public int currentHP;
 
-    [SerializeField] private int dexterity;
-    [SerializeField] private int strength;
-    [SerializeField] private int defence;
+    public int dexterity;
+    public int strength;
+    public int defence;
 
-    [SerializeField] private string equippedMeleeWeaponName;
-    [SerializeField] private string equippedRangeWeaponName;
+    public string equippedMeleeWeaponName;
+    public string equippedRangeWeaponName;
 
-    [SerializeField] private int meleeDamage;
-    [SerializeField] private int rangeDamage;
+    public int meleeDamage;
+    public int rangeDamage;
 
-    [SerializeField] private ItemManager equippedMeleeWeapon;
-    [SerializeField] private ItemManager equippedRangeWeapon;
+    public ItemsManager equipedMeleeWeapon, equipedRangeWeapon;
 
-    [SerializeField] private FeedbackAfterCombat rewardsTexts;
-
-    public string PlayerName => playerName;
-    public Sprite CharacterImage => characterImage;
-    public int PlayerLevel => playerLevel;
-    public int MaxLevel => maxLevel;
-    public int CurrentXp => currentXp;
-    public int[] XpForNextLevel => xpForNextLevel;
-    public int BaseLevelXp => baseLevelXp;
-    public int MaxHealth => maxHealth;
-    public int CurrentHealth => currentHealth;
-    public int Dexterity => dexterity;
-    public int Strength => strength;
-    public int Defence => defence;
-    public string EquippedMeleeWeaponName => equippedMeleeWeaponName;
-    public string EquippedRangeWeaponName => equippedRangeWeaponName;
-    public int MeleeDamage => meleeDamage;
-    public int RangeDamage => rangeDamage;
-    public ItemManager EquippedMeleeWeapon => equippedMeleeWeapon;
-    public ItemManager EquippedRangeWeapon => equippedRangeWeapon;
+    [SerializeField] FeedbackAfterCombat rewardsTexts;
 
     private void Start()
     {
@@ -60,7 +42,7 @@ public class PlayerStats : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         xpForNextLevel = new int[maxLevel];
-        xpForNextLevel[1] = baseLevelXp;
+        xpForNextLevel[1] = baseLevelXP;
 
         for(int i = 2; i < xpForNextLevel.Length; i++)
         {
@@ -70,78 +52,61 @@ public class PlayerStats : MonoBehaviour
     }
 
 
-    public void AddXp(int amountOfXp)
+    public void AddXP(int amountOfXp)
     {
         int amountToGive = Random.Range(105, 200);
-        currentXp += amountToGive;
-        if(currentXp > xpForNextLevel[playerLevel])
+        Debug.Log(currentXP);
+        Debug.Log(amountOfXp);
+        currentXP += amountToGive;
+        if(currentXP > xpForNextLevel[playerLevel])
             LevelUp();
+
+        Debug.Log(currentXP);
     }
 
     void LevelUp()
     {
+        Debug.Log(playerLevel);
         if (playerLevel % 2 == 0)
         {
+            Debug.Log("Gain DXT and STRG");
             dexterity += 2;
             strength += 2;
         }
         else
         {
+            Debug.Log("Gain DFC");
             defence += 2;
         }
 
-        currentXp -= xpForNextLevel[playerLevel];
+        currentXP -= xpForNextLevel[playerLevel];
         playerLevel++;
         StartCoroutine(ShowLevelUpSign());
         StartCoroutine(rewardsTexts.ShowLifeRestored());
     }
 
-    public void AddHealth(int amountToAdd)
+    public void AddHP(int amountHPToAdd)
     {
-        currentHealth += amountToAdd;
-        if(currentHealth > maxHealth)
+        currentHP += amountHPToAdd;
+        if(currentHP > maxHP)
         {
-            currentHealth = maxHealth;
+            currentHP = maxHP;
         }
     }
 
-    public void SetHealth(int amount)
+    public void EquipMeleeWeapon(ItemsManager meleeWeaponToEquip)
     {
-        currentHealth = amount;
-        if(currentHealth > maxHealth)
-        {
-            currentHealth = maxHealth;
-        }
-    }
-
-    public void SetStats(int level, int xp, int hp, int str, int dex, int def)
-    {
-        playerLevel = level;
-        currentXp = xp;
-        currentHealth = hp;
-        strength = str;
-        dexterity = dex;
-        defence = def;
-    }
-
-    public void HealFull()
-    {
-        currentHealth = maxHealth;
-    }
-
-    public void EquipMeleeWeapon(ItemManager meleeWeaponToEquip)
-    {
-        equippedMeleeWeapon = meleeWeaponToEquip;
-        equippedMeleeWeaponName = equippedMeleeWeapon.ItemName;
-        meleeDamage = equippedMeleeWeapon.WeaponStrength;
+        equipedMeleeWeapon = meleeWeaponToEquip;
+        equippedMeleeWeaponName = equipedMeleeWeapon.itemName;
+        meleeDamage = equipedMeleeWeapon.weaponStrength;
 
     }
     
-    public void EquipRangeWeapon(ItemManager rangeWeaponToEquip)
+    public void EquipRangeWeapon(ItemsManager rangeWeaponToEquip)
     {
-        equippedRangeWeapon = rangeWeaponToEquip;
-        equippedRangeWeaponName = equippedRangeWeapon.ItemName;
-        rangeDamage = equippedRangeWeapon.WeaponDexterity;
+        equipedRangeWeapon = rangeWeaponToEquip;
+        equippedRangeWeaponName = equipedRangeWeapon.itemName;
+        rangeDamage = equipedRangeWeapon.weaponDexterity;
     }
         
     IEnumerator ShowLevelUpSign()

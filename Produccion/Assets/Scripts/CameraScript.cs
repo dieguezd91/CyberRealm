@@ -7,6 +7,6 @@ public class CameraScript : MonoBehaviour
     public Transform player;
     void Start()
     {
-        player = GameManager.instance.Player.GetComponent<Transform>();
+        player = GameManager.instance.player.GetComponent<Transform>();
     }
 }

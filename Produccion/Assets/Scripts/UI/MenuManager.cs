@@ -28,13 +28,9 @@ public class MenuManager : MonoBehaviour
     [SerializeField] GameObject itemSlotContainer;
     [SerializeField] Transform itemSlotContainerParent;
 
-    [SerializeField] private Text itemName;
-    [SerializeField] private Text itemDescription;
+    public Text itemName, itemDescription;
 
-    public Text ItemName => itemName;
-    public Text ItemDescription => itemDescription;
-
-    public ItemManager activeItem;
+    public ItemsManager activeItem;
 
     [SerializeField] GameObject characterChoicePanel;
     public GameObject itemsDescription;
@@ -67,25 +63,25 @@ public class MenuManager : MonoBehaviour
     }
     private void Start()
     {
-        player = GameManager.instance.Player.GetComponent<PlayerController>();
+        player = GameManager.instance.player.GetComponent<PlayerController>();
     }
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.V) && !BattleManager.instance.IsBattleActive && !GameManager.instance.Chatting && !GameManager.instance.InStore)
+        if(Input.GetKeyDown(KeyCode.V) && !BattleManager.instance.isBattleActive && !GameManager.instance.chatting && !GameManager.instance.inStore)
         {
             OpenCloseInventory();
         }
-        else if(Input.GetKeyDown(KeyCode.Escape) && menu.activeInHierarchy && !BattleManager.instance.IsBattleActive && !GameManager.instance.Chatting && !GameManager.instance.InStore)
+        else if(Input.GetKeyDown(KeyCode.Escape) && menu.activeInHierarchy && !BattleManager.instance.isBattleActive && !GameManager.instance.chatting && !GameManager.instance.inStore)
         {
             OpenCloseInventory();
         }
 
 
-        CreditsUI.text = Inventory.instance.Credits.ToString();
-        pistolAmmoText.text = Inventory.instance.PistolAmmo.ToString();
-        SMGAmmoText.text = Inventory.instance.SmgAmmo.ToString();
-        shotgunShellText.text = Inventory.instance.ShotgunAmmo.ToString();
+        CreditsUI.text = Inventory.instance.credits.ToString();
+        pistolAmmoText.text = Inventory.instance.pistolAmmo.ToString();
+        SMGAmmoText.text = Inventory.instance.SMGAmmo.ToString();
+        shotgunShellText.text = Inventory.instance.shotgunAmmo.ToString();
     }
 
     public void UpdateStats()
@@ -96,16 +92,16 @@ public class MenuManager : MonoBehaviour
             {
             characterPanel[i].SetActive(true);
 
-            nameText[i].text = playerStats[i].PlayerName;
-            hpText[i].text = "PS: " + playerStats[i].CurrentHealth + "/" + playerStats[i].MaxHealth;
-            levelText[i].text = "Nivel: " + playerStats[i].PlayerLevel;
-            currentXPText[i].text = "EXP Actual: " + playerStats[i].CurrentXp;
+            nameText[i].text = playerStats[i].playerName;
+            hpText[i].text = "PS: " + playerStats[i].currentHP + "/" + playerStats[i].maxHP;
+            levelText[i].text = "Nivel: " + playerStats[i].playerLevel;
+            currentXPText[i].text = "EXP Actual: " + playerStats[i].currentXP;
 
-            characterImage[i].sprite = playerStats[i].CharacterImage;
+            characterImage[i].sprite = playerStats[i].characterImage;
 
-            xpText[i].text = playerStats[i].CurrentXp.ToString() + "/" + playerStats[i].XpForNextLevel[playerStats[i].PlayerLevel];
-            xpSlider[i].maxValue = playerStats[i].XpForNextLevel[playerStats[i].PlayerLevel];
-            xpSlider[i].value = playerStats[i].CurrentXp;
+            xpText[i].text = playerStats[i].currentXP.ToString() + "/" + playerStats[i].xpForNextLevel[playerStats[i].playerLevel];
+            xpSlider[i].maxValue = playerStats[i].xpForNextLevel[playerStats[i].playerLevel];
+            xpSlider[i].value = playerStats[i].currentXP;
         }
     }
 
@@ -115,7 +111,7 @@ public class MenuManager : MonoBehaviour
         for(int i = 0; i < playerStats.Length; i++)
         {
             statsButtons[i].SetActive(true);
-            statsButtons[i].GetComponentInChildren<Text>().text = playerStats[i].PlayerName;
+            statsButtons[i].GetComponentInChildren<Text>().text = playerStats[i].playerName;
         }
     }
 
@@ -123,21 +119,21 @@ public class MenuManager : MonoBehaviour
     {
         PlayerStats playerSelected = playerStats[playerSelectedNumber];
         
-        statCredits.text = Inventory.instance.Credits.ToString();
+        statCredits.text = Inventory.instance.credits.ToString();
 
-        statHP.text = playerSelected.CurrentHealth.ToString() + "/" + playerSelected.MaxHealth;
+        statHP.text = playerSelected.currentHP.ToString() + "/" + playerSelected.maxHP;
 
-        statDex.text = playerSelected.Dexterity.ToString();
-        statStr.text = playerSelected.Strength.ToString();
-        statDef.text = playerSelected.Defence.ToString();
+        statDex.text = playerSelected.dexterity.ToString();
+        statStr.text = playerSelected.strength.ToString();
+        statDef.text = playerSelected.defence.ToString();
 
-        characterStatImage.sprite = playerSelected.CharacterImage;
+        characterStatImage.sprite = playerSelected.characterImage;
 
-        statEquipedMeleeWeapon.text = playerSelected.EquippedMeleeWeaponName;
-        statEquipedRangeWeapon.text = playerSelected.EquippedRangeWeaponName;
+        statEquipedMeleeWeapon.text = playerSelected.equippedMeleeWeaponName;
+        statEquipedRangeWeapon.text = playerSelected.equippedRangeWeaponName;
 
-        statMeleeWeaponDamage.text = playerSelected.MeleeDamage.ToString();
-        statRangeWeaponDamage.text = playerSelected.RangeDamage.ToString();
+        statMeleeWeaponDamage.text = playerSelected.meleeDamage.ToString();
+        statRangeWeaponDamage.text = playerSelected.rangeDamage.ToString();
     }
 
     public void UpdateItemsInventory()
@@ -147,16 +143,16 @@ public class MenuManager : MonoBehaviour
             Destroy(itemSlot.gameObject);
         }
 
-        foreach(ItemManager item in Inventory.instance.GetItemsList())
+        foreach(ItemsManager item in Inventory.instance.GetItemsList())
         {
             RectTransform itemSlot = Instantiate(itemSlotContainer, itemSlotContainerParent).GetComponent<RectTransform>();
 
             Image itemImage = itemSlot.Find("Item image").GetComponent<Image>();
-            itemImage.sprite = item.Icon;
+            itemImage.sprite = item.icon;
 
             Text itemsAmountText = itemSlot.Find("Amount Text").GetComponent<Text>();
-            if (item.Amount > 1)
-                itemsAmountText.text = item.Amount.ToString();
+            if (item.amount > 1)
+                itemsAmountText.text = item.amount.ToString();
             else
                 itemsAmountText.text = "";
 
@@ -183,12 +179,12 @@ public class MenuManager : MonoBehaviour
             if (ConfirmQuit.activeInHierarchy)
                 ConfirmQuit.SetActive(false);
             menu.SetActive(false);
-            player.MoveSpeed = lastSpeed;   
+            player.moveSpeed = lastSpeed;   
         }
         else
         {
-            lastSpeed = player.MoveSpeed;
-            player.MoveSpeed = 0;
+            lastSpeed = player.moveSpeed;
+            player.moveSpeed = 0;
             UpdateStats();
             menu.SetActive(true);
             inventoryPanel.SetActive(false);

@@ -9,10 +9,10 @@ public class MissionPanelScript : MonoBehaviour
 
     void Update()
     {
-        for(int i = 0; i < QuestManager.instance.CompletedQuests.Length - 1; i++)
+        for(int i = 0; i < QuestManager.instance.questCompleted.Length - 1; i++)
         {
             Debug.Log(i);
-            if (QuestManager.instance.CompletedQuests[i+1])
+            if (QuestManager.instance.questCompleted[i+1])
             {
                 Debug.Log(i);
                 ticks[i].color = Color.green;

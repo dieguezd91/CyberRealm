@@ -9,50 +9,43 @@ using TMPro;
 public class Inventory : MonoBehaviour
 {
     public static Inventory instance;
-    
-    [SerializeField] private List<ItemManager> itemsList = new List<ItemManager>();
-    [SerializeField] private int credits;
-    [SerializeField] private bool hasCompletedTutorial;
+    public List<ItemsManager> itemsList;
+    public int credits;
+    public bool hasCompletedDinniesTutorial;
 
-    // AMMO
-    [SerializeField] private int pistolAmmo;
-    [SerializeField] private int shotgunAmmo;
-    [SerializeField] private int SMGAmmo;
-    [SerializeField] private bool hasAmmo;
+    //AMMO
+    public int pistolAmmo;
+    public int shotgunAmmo;
+    public int SMGAmmo;
+    public bool hasAmmo;
 
-    public IReadOnlyList<ItemManager> ItemsList => itemsList;
-    public int Credits { get => credits; set => credits = value; }
-    public bool HasCompletedTutorial { get => hasCompletedTutorial; set => hasCompletedTutorial = value; }
-    
-    public int PistolAmmo { get => pistolAmmo; set => pistolAmmo = value; }
-    public int ShotgunAmmo { get => shotgunAmmo; set => shotgunAmmo = value; }
-    public int SmgAmmo { get => SMGAmmo; set => SMGAmmo = value; }
-    public bool HasAmmo { get => hasAmmo; set => hasAmmo = value; }
 
     private void Start()
     {
         if (instance != null && instance != this) Destroy(gameObject);
         else instance = this;
         DontDestroyOnLoad(gameObject);
+
+        itemsList = new List<ItemsManager>();
     }
 
-    public void AddItem(ItemManager item)
+    public void AddItems(ItemsManager item)
     {
-        if(item.Type == ItemManager.ItemType.Ammo)
+        if(item.itemType == ItemsManager.ItemType.Ammo)
         {
             item.UseItem(0);
         }
         else
         {
-            if (item.IsStackable)
+            if (item.isStackable)
             {
                 bool itemAlreadyInInventory = false;
 
-                foreach (ItemManager itemInInventory in itemsList)
+                foreach (ItemsManager itemInInventory in itemsList)
                 {
-                    if (itemInInventory.ItemName == item.ItemName)
+                    if (itemInInventory.itemName == item.itemName)
                     {
-                        itemInInventory.Amount++;
+                        itemInInventory.amount++;
                         itemAlreadyInInventory = true;
                     }
                 }
@@ -70,38 +63,38 @@ public class Inventory : MonoBehaviour
         
     }
 
-    public void RemoveItem(ItemManager item)
+    public void RemoveItem(ItemsManager item)
     {
-        if(item.Type == ItemManager.ItemType.Ammo)
+        if(item.itemType == ItemsManager.ItemType.Ammo)
         {
-            switch(item.WeaponType)
+            switch(item.itemName)
             {
-                case WeaponType.Pistola:
+                case "Balas de pistola":
                     pistolAmmo--;
                     break;
-                case WeaponType.Escopeta:
+                case "Cartuchos de escopeta":
                     shotgunAmmo--;
                     break;
-                case WeaponType.Subfusil:
+                case "Balas de subfusil":
                     SMGAmmo--;
                     break;
             }
         }
         else
         {
-            if (item.IsStackable)
+            if (item.isStackable)
             {
-                ItemManager inventoryItem = null;
-                foreach (ItemManager itemInInventory in itemsList)
+                ItemsManager inventoryItem = null;
+                foreach (ItemsManager itemInInventory in itemsList)
                 {
-                    if (itemInInventory.ItemName == item.ItemName)
+                    if (itemInInventory.itemName == item.itemName)
                     {
-                        itemInInventory.Amount--;
+                        itemInInventory.amount--;
                         inventoryItem = itemInInventory;
                     }
                 }
 
-                if (inventoryItem != null && inventoryItem.Amount <= 0)
+                if (inventoryItem != null && inventoryItem.amount <= 0)
                 {
                     itemsList.Remove(inventoryItem);
                 }
@@ -114,13 +107,13 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    public void AddCredits(int amount)
+    public void AddCredits(int creditsToGive)
     {
-        credits += amount;
-        Debug.Log("Ganaste " + amount.ToString() + " creditos");
+        credits += creditsToGive;
+        Debug.Log("Ganaste " + creditsToGive.ToString() + " creditos");
     }
 
-    public List<ItemManager> GetItemsList()
+    public List<ItemsManager> GetItemsList()
     {
         return itemsList;
     }

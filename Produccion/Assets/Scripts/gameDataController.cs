@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-public class GameDataController : MonoBehaviour
+public class gameDataController : MonoBehaviour
 {
-    [SerializeField] private GameObject player;
-    [SerializeField] private PlayerStats playerStats;
+    public GameObject player;
+    public PlayerStats playerStats;
 
     private string saveArchives;
-    [SerializeField] private GameData gameData = new GameData();
-
-    public GameData Data => gameData;
+    public gameData gameData = new gameData();
 
     private void Awake()
     {
@@ -20,21 +18,25 @@ public class GameDataController : MonoBehaviour
 
     private void Start()
     {
-        player = GameManager.instance.Player;
-        playerStats = GameManager.instance.Player.GetComponent<PlayerStats>();
+        player = GameManager.instance.player;
+        playerStats = GameManager.instance.player.GetComponent<PlayerStats>();
     }
-
     public void LoadData()
     {
         if (File.Exists(saveArchives))
         {
             string content = File.ReadAllText(saveArchives);
-            gameData = JsonUtility.FromJson<GameData>(content);
+            gameData = JsonUtility.FromJson<gameData>(content);
 
-            SceneManagerScript.instance.LoadScene(gameData.Scene);
-            Inventory.instance.Credits = gameData.Credits;
-            playerStats.SetStats(gameData.Level, gameData.Xp, gameData.LifePoints, gameData.Strength, gameData.Dexterity, gameData.Defence);
-            QuestManager.instance.CompletedQuests = gameData.CompletedQuests;
+            SceneManagerScript.instance.LoadScene(gameData.scene);
+            Inventory.instance.credits = gameData.credits;
+            playerStats.currentXP = gameData.xp;
+            playerStats.playerLevel = gameData.level;
+            playerStats.currentHP = gameData.lifePoints;
+            playerStats.strength = gameData.strength;
+            playerStats.dexterity = gameData.dexterity;
+            playerStats.defence = gameData.defence;
+            QuestManager.instance.questCompleted = gameData.completedQuests;
         }
         else
         {
@@ -44,18 +46,18 @@ public class GameDataController : MonoBehaviour
 
     public void SaveData()
     {
-        GameData newData = new GameData()
+        gameData newData = new gameData()
         {
-            Position = player.transform.position,
-            LifePoints = playerStats.CurrentHealth,
-            Xp = playerStats.CurrentXp,
-            Dexterity = playerStats.Dexterity,
-            Strength = playerStats.Strength,
-            Defence = playerStats.Defence,
-            Level = playerStats.PlayerLevel,
-            Credits = Inventory.instance.Credits,
-            Scene = SceneManagerScript.instance.CurrentScene,
-            CompletedQuests = QuestManager.instance.CompletedQuests,
+            position = player.transform.position,
+            lifePoints = playerStats.currentHP,
+            xp = playerStats.currentXP,
+            dexterity = playerStats.dexterity,
+            strength = playerStats.strength,
+            defence = playerStats.defence,
+            level = playerStats.playerLevel,
+            credits = Inventory.instance.credits,
+            scene = SceneManagerScript.instance.scene,
+            completedQuests = QuestManager.instance.questCompleted,
         };
 
         string JSONchain = JsonUtility.ToJson(newData);

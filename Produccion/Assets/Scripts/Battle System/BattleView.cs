@@ -63,12 +63,12 @@ public class BattleView : MonoBehaviour
     {
         for (int i = 0; i < playersNameText.Length; i++)
         {
-            if (activeCharacters.Count > i && activeCharacters[i].IsPlayer)
+            if (activeCharacters.Count > i && activeCharacters[i].IsPlayer())
             {
                 playerBattleStats[i].SetActive(true);
-                playersNameText[i].text = activeCharacters[i].CharacterName;
-                playerHealthSlider[i].maxValue = activeCharacters[i].MaxHealth;
-                playerHealthSlider[i].value = activeCharacters[i].CurrentHealth;
+                playersNameText[i].text = activeCharacters[i].characterName;
+                playerHealthSlider[i].maxValue = activeCharacters[i].maxHP;
+                playerHealthSlider[i].value = activeCharacters[i].currentHP;
             }
             else
             {
@@ -82,12 +82,12 @@ public class BattleView : MonoBehaviour
     {
         for (int i = 0; i < enemysNameText.Length; i++)
         {
-            if (activeCharacters.Count > i + 1 && !activeCharacters[i+1].IsPlayer)
+            if (activeCharacters.Count > i + 1 && !activeCharacters[i+1].IsPlayer())
             {
                 enemyBattleStats[i].SetActive(true);
-                enemysNameText[i].text = activeCharacters[i+1].CharacterName;
-                enemyHealthSlider[i].maxValue = activeCharacters[i+1].MaxHealth;
-                enemyHealthSlider[i].value = activeCharacters[i+1].CurrentHealth;
+                enemysNameText[i].text = activeCharacters[i+1].characterName;
+                enemyHealthSlider[i].maxValue = activeCharacters[i+1].maxHP;
+                enemyHealthSlider[i].value = activeCharacters[i+1].currentHP;
             }
             else
             {
@@ -97,20 +97,20 @@ public class BattleView : MonoBehaviour
         }
     }
 
-    public void UpdateAmmo(ItemManager equipedRangeWeapon)
+    public void UpdateAmmo(ItemsManager equipedRangeWeapon)
     {
         if (equipedRangeWeapon != null)
         {
-            switch (equipedRangeWeapon.WeaponType)
+            switch (equipedRangeWeapon.itemName)
             {
-                case WeaponType.Escopeta:
-                    amountOfAmmo.text = Inventory.instance.ShotgunAmmo.ToString();                    
+                case "Escopeta":
+                    amountOfAmmo.text = Inventory.instance.shotgunAmmo.ToString();                    
                     break;
-                case WeaponType.Subfusil:
-                    amountOfAmmo.text = Inventory.instance.SmgAmmo.ToString();
+                case "Subfusil":
+                    amountOfAmmo.text = Inventory.instance.SMGAmmo.ToString();
                     break;
-                case WeaponType.Pistola:
-                    amountOfAmmo.text = Inventory.instance.PistolAmmo.ToString();
+                case "Pistola":
+                    amountOfAmmo.text = Inventory.instance.pistolAmmo.ToString();
                     break;
                 default:
                     amountOfAmmo.text = "0";
@@ -136,26 +136,26 @@ public class BattleView : MonoBehaviour
         }
     }
 
-    public void CreateItemButton(ItemManager item)
+    public void CreateItemButton(ItemsManager item)
     {
         RectTransform itemSlot = Instantiate(itemSlotContainerPrefab, itemSlotContainerParent).GetComponent<RectTransform>();
 
         Image itemImage = itemSlot.Find("Item image").GetComponent<Image>();
-        itemImage.sprite = item.Icon;
+        itemImage.sprite = item.icon;
 
         Text itemsAmountText = itemSlot.Find("Amount Text").GetComponent<Text>();
-        if (item.Amount > 1)
-            itemsAmountText.text = item.Amount.ToString();
+        if (item.amount > 1)
+            itemsAmountText.text = item.amount.ToString();
         else
             itemsAmountText.text = "";
 
         itemSlot.GetComponent<ItemButton>().itemOnButton = item;
     }
 
-    public void SelectItem(ItemManager itemToUse)
+    public void SelectItem(ItemsManager itemToUse)
     {
-        itemName.text = itemToUse.ItemName;
-        itemDescriptionText.text = itemToUse.ItemDescription;
+        itemName.text = itemToUse.itemName;
+        itemDescriptionText.text = itemToUse.itemDescription;
         itemDescription.SetActive(true);
     }
 

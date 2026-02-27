@@ -8,7 +8,7 @@ using System;
 public class PickUpItem : MonoBehaviour
 {
     [SerializeField] GameObject item;
-    [SerializeField] ItemManager invItem;
+    [SerializeField] ItemsManager invItem;
     [SerializeField] bool openDoorAfterFight;
     [SerializeField] GameObject door;
     [SerializeField] GameObject objectToDisable;
@@ -21,7 +21,7 @@ public class PickUpItem : MonoBehaviour
     {
         inventory = GameManager.instance.GetComponent<Inventory>();
         collider = gameObject.GetComponent<Collider2D>();
-        if(inventory.HasCompletedTutorial)
+        if(inventory.hasCompletedDinniesTutorial)
         {
             item.SetActive(false);
             collider.enabled = false;
@@ -32,18 +32,18 @@ public class PickUpItem : MonoBehaviour
     {
         item.SetActive(false);
         collider.enabled = false;
-        Inventory.instance.AddItem(invItem);
-        GameManager.instance.Tutorial = false;
+        Inventory.instance.itemsList.Add(invItem);
+        GameManager.instance.tutorial = false;
         eventToEnable.enabled = true;
         door.SetActive(true);
         objectToDisable.SetActive(false);
-        Inventory.instance.HasCompletedTutorial = true;
+        Inventory.instance.hasCompletedDinniesTutorial = true;
     }
 
     void OpenDoor(object sender, EventArgs e)
     {
         door.SetActive(true);
         objectToDisable.SetActive(false);
-        Inventory.instance.HasCompletedTutorial = true;
+        Inventory.instance.hasCompletedDinniesTutorial = true;
     }
 }

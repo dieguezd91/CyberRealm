@@ -13,7 +13,7 @@ public class FastTravelScript : MonoBehaviour
 
     private void Start()
     {
-        player = GameManager.instance.Player;
+        player = GameManager.instance.player;
     }
 
     private void Update()
@@ -23,10 +23,10 @@ public class FastTravelScript : MonoBehaviour
 
     public void Travel()
     {
-        if (Inventory.instance.Credits >= 50)
+        if (Inventory.instance.credits >= 50)
         {
             player.transform.position = garage;
-            Inventory.instance.Credits -= 50;
+            Inventory.instance.credits -= 50;
         }
         else noCredits.text = "Creditos insuficientes";
 

@@ -11,7 +11,7 @@ public class NPCScript : MonoBehaviour
 
     private void Start()
     {
-        playerController = GameManager.instance.Player.GetComponent<PlayerController>();
+        playerController = GameManager.instance.player.GetComponent<PlayerController>();
     }
     void Update()
     {
@@ -22,18 +22,18 @@ public class NPCScript : MonoBehaviour
         {
             if(MenuManager.instance.menu.activeInHierarchy)
                 MenuManager.instance.OpenCloseInventory();
-            lastSpeed = playerController.MoveSpeed;
-            playerController.MoveSpeed = 0;
+            lastSpeed = playerController.moveSpeed;
+            playerController.moveSpeed = 0;
             menu.SetActive(true);
-            GameManager.instance.InStore = true;
+            GameManager.instance.inStore = true;
 
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             menu.SetActive(false);
-            GameManager.instance.InStore = false;
-            playerController.MoveSpeed = lastSpeed;
+            GameManager.instance.inStore = false;
+            playerController.moveSpeed = lastSpeed;
         }
     }
 

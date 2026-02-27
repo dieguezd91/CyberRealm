@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CollectedItemManager : MonoBehaviour
+public class CollectedItemsManager : MonoBehaviour
 {
-    public static CollectedItemManager instance;
+    public static CollectedItemsManager instance;
     [SerializeField] GameObject[] items;
     public string[] scene;
     public bool[] collected;

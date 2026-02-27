@@ -5,18 +5,18 @@ using UnityEngine;
 public class ItemButton : MonoBehaviour
 {
 
-    public ItemManager itemOnButton;
+    public ItemsManager itemOnButton;
     
     public void Press()
     {
-        if(BattleManager.instance.IsBattleActive && BattleManager.instance.View.itemsToUseMenu.activeInHierarchy)
+        if(BattleManager.instance.isBattleActive && BattleManager.instance.battleView.itemsToUseMenu.activeInHierarchy)
         {
             BattleManager.instance.SelectedItemToUse(itemOnButton);
         }
         else
         {
-            MenuManager.instance.ItemName.text = itemOnButton.ItemName;
-            MenuManager.instance.ItemDescription.text = itemOnButton.ItemDescription;
+            MenuManager.instance.itemName.text = itemOnButton.itemName;
+            MenuManager.instance.itemDescription.text = itemOnButton.itemDescription;
             MenuManager.instance.activeItem = itemOnButton;
             MenuManager.instance.itemsDescription.SetActive(true);
         }

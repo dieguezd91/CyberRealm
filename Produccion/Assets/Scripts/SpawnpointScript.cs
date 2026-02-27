@@ -12,28 +12,28 @@ public class SpawnpointScript : MonoBehaviour
 
     void Start()
     {
-        player = GameManager.instance.Player;
+        player = GameManager.instance.player;
         Spawn();
     }
 
     public void Spawn()
     {
         Debug.Log("spawnMethod");
-        switch (SceneManagerScript.instance.CurrentScene)
+        switch (SceneManagerScript.instance.scene)
         {
             case "Bar":
-                if (GameManager.instance.Tutorial) player.transform.position = alternativeSpawn.position;
+                if (GameManager.instance.tutorial) player.transform.position = alternativeSpawn.position;
                 else  player.transform.position = spawnpoint.position;
                 break;
             case "Ciudad":
-                player.transform.position = GameManager.instance.LastPosition;
+                player.transform.position = GameManager.instance.lastPosition;
                 break;
             case "Garage":
-                if (GameManager.instance.Respawned)
+                if (GameManager.instance.respawned)
                 {
-                    Debug.Log(GameManager.instance.Respawned);
+                    Debug.Log(GameManager.instance.respawned);
                     player.transform.position = alternativeSpawn.position;
-                    GameManager.instance.Respawned = false;
+                    GameManager.instance.respawned = false;
                 }
                 else player.transform.position = spawnpoint.position;
                 break;

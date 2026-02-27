@@ -7,21 +7,16 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController instance;
-    [SerializeField] private GameObject worldCamera;
+    public GameObject worldCamera;
 
-    [SerializeField] private float moveSpeed;
-    [SerializeField] private bool isMoving;
-    [SerializeField] private Vector2 inputVector;
+    public float moveSpeed;
+    public bool isMoving;
+    public Vector2 input;
     private Rigidbody2D rb;
 
-    [SerializeField] private LayerMask enemiesLayer;
+    public LayerMask enemiesLayer;
 
     private Animator animator;
-
-    public GameObject WorldCamera => worldCamera;
-    public float MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
-    public bool IsMoving => isMoving;
-    public Vector2 InputVector => inputVector;
 
     private void Awake()
     {
@@ -48,20 +43,20 @@ public class PlayerController : MonoBehaviour
         // MOVIMIENTO
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
-        inputVector = new Vector2(moveX, moveY).normalized;
+        input = new Vector2(moveX, moveY).normalized;
 
-        if (!GameManager.instance.Chatting || !GameManager.instance.InStore || !MenuManager.instance.menu.activeInHierarchy)
+        if (!GameManager.instance.chatting || !GameManager.instance.inStore || !MenuManager.instance.menu.activeInHierarchy)
         {
             // ANIMACIONES
-            animator.SetFloat("Horizontal", inputVector.x);
-            animator.SetFloat("Vertical", inputVector.y);
-            animator.SetFloat("Speed", inputVector.sqrMagnitude);
+            animator.SetFloat("Horizontal", input.x);
+            animator.SetFloat("Vertical", input.y);
+            animator.SetFloat("Speed", input.sqrMagnitude);
 
         }
     }
 
     private void FixedUpdate()
     {
-        rb.MovePosition(rb.position + inputVector * moveSpeed * Time.deltaTime);
+        rb.MovePosition(rb.position + input * moveSpeed * Time.deltaTime);
     }
 }

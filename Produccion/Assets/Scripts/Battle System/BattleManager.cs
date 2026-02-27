@@ -6,64 +6,56 @@ using UnityEngine;
 public class BattleManager : MonoBehaviour
 {
     public static BattleManager instance;
-    
-    [SerializeField] private bool isBattleActive;
-    private bool inventoryIsOpen;
+    public bool isBattleActive;
+    bool inventoryIsOpen;
 
     [Header("Dependencies")]
-    [SerializeField] private BattleView battleView;
+    [SerializeField] public BattleView battleView;
     private CombatSystem combatSystem;
 
     [Header("Scene References")]
-    [SerializeField] private GameObject battleScene;
-    [SerializeField] private Camera battleCamera;
-    [SerializeField] private AudioListener battleAudioListener;
-    [SerializeField] private Camera worldCamera;
-    [SerializeField] private AudioListener worldAudioListener;
+    [SerializeField] GameObject battleScene;
+    public Camera battleCamera;
+    public AudioListener battleAudioListener;
+    public Camera worldCamera;
+    public AudioListener worldAudioListener;
     
-    [SerializeField] private List<BattleCharacters> activeCharacters = new List<BattleCharacters>();
-    [SerializeField] private GameObject lastEnemy;
-    [SerializeField] private GameObject enemyGO;
-    private Collider2D enemyCollider;
+    [SerializeField] List<BattleCharacters> activeCharacters = new List<BattleCharacters>();
+    [SerializeField] GameObject lastEnemy;
+    [SerializeField] GameObject enemyGO;
+    Collider2D enemyCollider;
 
-    [SerializeField] private Transform playersPositions;
-    [SerializeField] private Transform enemiesPositions;
+    [SerializeField] Transform playersPositions;
+    [SerializeField] Transform enemiesPositions;
 
-    [SerializeField] private BattleCharacters[] playerPrefabs;
-    [SerializeField] private BattleCharacters[] enemiesPrefabs;
+    [SerializeField] BattleCharacters[] playerPrefabs, enemiesPrefabs;
 
-    [SerializeField] private int currentTurn;
-    [SerializeField] private bool waitingForTurn;
-    [SerializeField] private GameObject UIButtonHolder;
+    [SerializeField] int currentTurn;
+    [SerializeField] bool waitingForTurn;
+    [SerializeField] GameObject UIButtonHolder;
 
-    [SerializeField] private BattleMoves[] battleMovesList;
+    [SerializeField] BattleMoves[] battleMovesList;
 
-    [SerializeField] private float chanceToRunAway = 0.5f;
-    [SerializeField] private ItemManager selectedItem;
+    [SerializeField] float chanceToRunAway = 0.5f;
+    [SerializeField] ItemsManager selectedItem;
 
     private int amountOfXp;
 
-    [SerializeField] private bool allEnemiesAreDead = true;
-    [SerializeField] private bool allPlayersAreDead = true;
+    public bool allEnemiesAreDead = true;
+    public bool allPlayersAreDead = true;
 
-    [SerializeField] private bool randomBattle;
-    [SerializeField] private bool isDinnieBattle;
-    [SerializeField] private bool bossBattle;
+    public bool randomBattle;
+    public bool dinniesBattle;
+    public bool bossBattle;
 
     public event EventHandler OnBattleEnd;
 
-    private AudioSource combatSong;
-    private RandomBattle randomCombat;
-    private float lastRandomBattle;
-    [SerializeField] private float inmunityTime;
+    AudioSource combatSong;
+    RandomBattle randomCombat;
+    float lastRandomBattle;
+    [SerializeField] float inmunityTime;
 
-    public bool IsBattleActive => isBattleActive;
-    public bool IsDinnieBattle => isDinnieBattle;
-    public bool BossBattle => bossBattle;
-    public bool RandomBattle => randomBattle;
-    public BattleView View => battleView;
-
-    private void Awake()
+    void Awake()
     {
         if (instance != null && instance != this)
         {
@@ -80,14 +72,14 @@ public class BattleManager : MonoBehaviour
 
     private void Start()
     {
-        worldCamera = PlayerController.instance.WorldCamera.GetComponent<Camera>();
+        worldCamera = PlayerController.instance.worldCamera.GetComponent<Camera>();
         worldAudioListener = worldCamera.gameObject.GetComponent<AudioListener>();
         battleAudioListener = battleCamera.gameObject.GetComponent<AudioListener>();
         combatSong = MusicManager.instance.GetComponent<AudioSource>();
         lastRandomBattle = 0;
     }
 
-    private void Update()
+    void Update()
     {
         CheckPlayerButtonHolder();
     }
@@ -98,7 +90,7 @@ public class BattleManager : MonoBehaviour
         {
             if (waitingForTurn)
             {
-                if (activeCharacters[currentTurn].IsPlayer)
+                if (activeCharacters[currentTurn].IsPlayer())
                 {
                     UIButtonHolder.SetActive(true);
                 }
@@ -111,10 +103,10 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public void StartBattle(GameObject enemy, EnemyType enemyToSpawn, bool isDinnieBattleParam, bool isRandomBattle, bool isBossBattle)
+    public void StartBattle(GameObject enemy, string enemiesToSpawn, bool isDinniesBAttle, bool isRandomBattle, bool isBossBattle)
     {
         randomBattle = isRandomBattle;
-        isDinnieBattle = isDinnieBattleParam;
+        dinniesBattle = isDinniesBAttle;
         bossBattle = isBossBattle;
 
         if (randomBattle)
@@ -138,34 +130,28 @@ public class BattleManager : MonoBehaviour
         {
             SettingUpBattle();
             AddingPlayers();
-            AddingEnemies(enemyToSpawn);
+            AddingEnemies(enemiesToSpawn);
             
             battleView.UpdatePlayerStats(activeCharacters);
             battleView.UpdateEnemyStats(activeCharacters);
             
-            if (activeCharacters.Count > 0 && activeCharacters[0].IsPlayer)
+            if (activeCharacters.Count > 0 && activeCharacters[0].IsPlayer())
             {
-                CheckAmmoStatus(activeCharacters[0].EquippedRangeWeapon);
-                battleView.UpdateAmmo(activeCharacters[0].EquippedRangeWeapon);
+                CheckAmmoStatus(activeCharacters[0].equipedRangeWeapon);
+                battleView.UpdateAmmo(activeCharacters[0].equipedRangeWeapon);
             }
 
             waitingForTurn = true;
             currentTurn = 0;
         }
-        GameManager.instance.Player.SetActive(false);
+        GameManager.instance.player.SetActive(false);
     }
 
-    private void AddingEnemies(EnemyType enemyToSpawn)
+    private void AddingEnemies(string enemiesToSpawn)
     {
         for (int j = 0; j < enemiesPrefabs.Length; j++)
         {
-            EnemyType prefabEnemyType = enemiesPrefabs[j].EnemyType;
-            if (prefabEnemyType == EnemyType.None)
-            {
-                prefabEnemyType = CombatEnumAdapter.GetEnemyType(enemiesPrefabs[j].CharacterName);
-            }
-
-            if (prefabEnemyType == enemyToSpawn)
+            if (enemiesPrefabs[j].characterName == enemiesToSpawn)
             {
                 BattleCharacters newEnemy = Instantiate(
                     enemiesPrefabs[j],
@@ -178,7 +164,6 @@ public class BattleManager : MonoBehaviour
                 else
                     activeCharacters[1] = newEnemy;
                 lastEnemy = activeCharacters[1].gameObject;
-                break;
             }
         }
     }
@@ -194,7 +179,7 @@ public class BattleManager : MonoBehaviour
             {
                 for (int j = 0; j < playerPrefabs.Length; j++)
                 {
-                    if (playerPrefabs[j].CharacterName == GameManager.instance.GetPlayerStats()[i].PlayerName)
+                    if (playerPrefabs[j].characterName == GameManager.instance.GetPlayerStats()[i].playerName)
                     {
                         BattleCharacters newPlayer = Instantiate(
                             playerPrefabs[j],
@@ -217,31 +202,47 @@ public class BattleManager : MonoBehaviour
     private void ImportPlayerStats(int i)
     {
         PlayerStats player = GameManager.instance.GetPlayerStats()[i];
-        activeCharacters[i].SetStats(player.CurrentHealth, player.MaxHealth, player.PlayerLevel, player.Dexterity, player.Strength, player.Defence, player.MeleeDamage, player.RangeDamage);
-        activeCharacters[i].SetEquippedWeapons(player.EquippedMeleeWeapon, player.EquippedRangeWeapon);
+
+        activeCharacters[i].currentHP = player.currentHP;
+        activeCharacters[i].maxHP = player.maxHP;
+
+        activeCharacters[i].level = player.playerLevel;
+
+        activeCharacters[i].dexterity = player.dexterity;
+        activeCharacters[i].strength = player.strength;
+        activeCharacters[i].defence = player.defence;
+
+        activeCharacters[i].meleeWeaponDamage = player.meleeDamage;
+        activeCharacters[i].rangeWeaponDamage = player.rangeDamage;
+
+        if (i == 0 && player.equipedRangeWeapon != null)
+        {
+            activeCharacters[i].equipedRangeWeapon = player.equipedRangeWeapon;
+        }
     }
 
     private void ExportPlayerStats(int i)
     {
         PlayerStats player = GameManager.instance.GetPlayerStats()[i];
-        player.SetHealth(activeCharacters[i].CurrentHealth);
-        if (PlayerStats.instance.PlayerLevel > activeCharacters[i].Level)
-            PlayerStats.instance.HealFull();
+
+        player.currentHP = activeCharacters[i].currentHP;
+        if (PlayerStats.instance.playerLevel > activeCharacters[i].level)
+            PlayerStats.instance.currentHP = PlayerStats.instance.maxHP;
     }
 
     private void SettingUpBattle()
     {
         isBattleActive = true;
-        GameManager.instance.BattleIsActive = true;
+        GameManager.instance.battleIsActive = true;
 
         battleScene.SetActive(true);
         worldCamera.gameObject.SetActive(false);
         battleCamera.gameObject.SetActive(true);
         worldAudioListener.enabled = false;
         battleAudioListener.enabled = true;
-        MusicManager.instance.AudioSource.Stop();
-        combatSong.clip = MusicManager.instance.Songs[4];
-        MusicManager.instance.AudioSource.Play();
+        MusicManager.instance.audioSource.Stop();
+        combatSong.clip = MusicManager.instance.songs[4];
+        MusicManager.instance.audioSource.Play();
     }
 
     private void NextTurn()
@@ -258,16 +259,25 @@ public class BattleManager : MonoBehaviour
 
     private void UpdateBattle()
     {
-        allEnemiesAreDead = true;
-        allPlayersAreDead = true;
+        bool allEnemiesAreDead = true;
+        bool allPlayersAreDead = true;
 
         int ammoRewards = UnityEngine.Random.Range(3, 5);        
 
         for (int i = 0; i < activeCharacters.Count; i++)
         {
-            if (activeCharacters[i].CurrentHealth > 0)
+            if (activeCharacters[i].currentHP < 0)
             {
-                if (activeCharacters[i].IsPlayer)
+                activeCharacters[i].currentHP = 0;
+            }
+
+            if (activeCharacters[i].currentHP == 0)
+            {
+                //kill character
+            }
+            else
+            {
+                if (activeCharacters[i].IsPlayer())
                     allPlayersAreDead = false;
                 else
                     allEnemiesAreDead = false;
@@ -276,18 +286,18 @@ public class BattleManager : MonoBehaviour
 
         if (allEnemiesAreDead || allPlayersAreDead)
         {
-            GameManager.instance.Player.SetActive(true);
+            GameManager.instance.player.SetActive(true);
 
             if (allEnemiesAreDead)
             {
-                PlayerStats.instance.AddXp(amountOfXp);
+                PlayerStats.instance.AddXP(amountOfXp);
                 MenuManager.instance.AddCreditsUI();
-                Inventory.instance.PistolAmmo += ammoRewards;
+                Inventory.instance.pistolAmmo += ammoRewards;
                 StartCoroutine(battleView.rewardsTexts.ShowAmmoRewards(ammoRewards.ToString()));
                 ExportPlayerStats(0);
                 if (!randomBattle) Destroy(enemyGO);
                 
-                if (randomBattle || IsDinnieBattle)
+                if (randomBattle || dinniesBattle)
                     OnBattleEnd?.Invoke(this, EventArgs.Empty);
                     
                 if(bossBattle)
@@ -303,7 +313,7 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            while (activeCharacters[currentTurn].CurrentHealth == 0)
+            while (activeCharacters[currentTurn].currentHP == 0)
             {
                 currentTurn++;
                 if (currentTurn >= activeCharacters.Count)
@@ -355,22 +365,22 @@ public class BattleManager : MonoBehaviour
         StartCoroutine(battleView.Shake(activeCharacters[1].GetComponent<Rigidbody2D>()));
         DealRangeDamageToCharacters(1);
         
-        switch (activeCharacters[0].EquippedRangeWeapon.WeaponType)
+        switch (activeCharacters[0].equipedRangeWeapon.itemName)
         {
-            case WeaponType.Pistola:
-                Inventory.instance.PistolAmmo--;
+            case "Pistola":
+                Inventory.instance.pistolAmmo--;
                 break;
-            case WeaponType.Subfusil:
-                Inventory.instance.SmgAmmo--;
+            case "Subfusil":
+                Inventory.instance.SMGAmmo--;
                 break;
-            case WeaponType.Escopeta:
-                Inventory.instance.ShotgunAmmo--;
+            case "Escopeta":
+                Inventory.instance.shotgunAmmo--;
                 break;
         }
         
-        CheckAmmoStatus(activeCharacters[0].EquippedRangeWeapon);
-        battleView.UpdateAmmo(activeCharacters[0].EquippedRangeWeapon);
-        AudioManager.instance.SelectRangeAttackSfx(activeCharacters[0].EquippedRangeWeapon);
+        CheckAmmoStatus(activeCharacters[0].equipedRangeWeapon);
+        battleView.UpdateAmmo(activeCharacters[0].equipedRangeWeapon);
+        AudioManager.instance.selectRangeAttackSFX(activeCharacters[0].equipedRangeWeapon);
 
         NextTurn();
     }
@@ -380,10 +390,10 @@ public class BattleManager : MonoBehaviour
         StartCoroutine(battleView.Shake(activeCharacters[1].GetComponent<Rigidbody2D>()));
         DealMeleeDamageToCharacters(1);
 
-        if (activeCharacters[0].EquippedRangeWeapon == null) 
-            AudioManager.instance.SelectMeleeAttackSfx(null);
+        if (activeCharacters[0].equipedRangeWeapon == null) 
+            AudioManager.instance.SelectMeleeAttackSFX(null);
         else 
-            AudioManager.instance.SelectMeleeAttackSfx(activeCharacters[0].EquippedMeleeWeapon);
+            AudioManager.instance.SelectMeleeAttackSFX(activeCharacters[0].equipedMeleeWeapon);
 
         NextTurn();
     }
@@ -392,36 +402,36 @@ public class BattleManager : MonoBehaviour
     {
         int damageToGive = combatSystem.CalculateRangeDamage(activeCharacters[currentTurn], activeCharacters[selectedCharacterToAttack]);
         
-        string attackerName = activeCharacters[currentTurn].CharacterName;
-        string defenderName = activeCharacters[selectedCharacterToAttack].CharacterName;
+        string attackerName = activeCharacters[currentTurn].characterName;
+        string defenderName = activeCharacters[selectedCharacterToAttack].characterName;
 
         StartCoroutine(battleView.ShowLog($"{attackerName} usa ataque a rango y causa {damageToGive} de dano a {defenderName}"));
 
         bool isPlayerAttacking = currentTurn == 0;
         StartCoroutine(battleView.ShowDamageEffect(damageToGive, false, isPlayerAttacking));
         
-        activeCharacters[selectedCharacterToAttack].TakeDamage(damageToGive);
+        activeCharacters[selectedCharacterToAttack].TakeHPDamage(damageToGive);
     }
 
     private void DealMeleeDamageToCharacters(int selectedCharacterToAttack)
     {
         int damageToGive = combatSystem.CalculateMeleeDamage(activeCharacters[currentTurn], activeCharacters[selectedCharacterToAttack]);
 
-        string attackerName = activeCharacters[currentTurn].CharacterName;
-        string defenderName = activeCharacters[selectedCharacterToAttack].CharacterName;
+        string attackerName = activeCharacters[currentTurn].characterName;
+        string defenderName = activeCharacters[selectedCharacterToAttack].characterName;
 
         StartCoroutine(battleView.ShowLog($"{attackerName} usa ataque melee y causa {damageToGive} de dano a {defenderName}"));
 
         bool isPlayerAttacking = currentTurn == 0;
         StartCoroutine(battleView.ShowDamageEffect(damageToGive, false, isPlayerAttacking));
         
-        activeCharacters[selectedCharacterToAttack].TakeDamage(damageToGive);
+        activeCharacters[selectedCharacterToAttack].TakeHPDamage(damageToGive);
     }
 
     private void Heal()
     {
-        activeCharacters[currentTurn].AddHealth(50);
-        StartCoroutine(battleView.ShowLog($"{activeCharacters[currentTurn].CharacterName} heals 50 health points."));
+        activeCharacters[currentTurn].AddHP(50);
+        StartCoroutine(battleView.ShowLog($"{activeCharacters[currentTurn].name} se cura 50 puntos de vida."));
         
         bool isPlayerAttacking = currentTurn == 0;
         StartCoroutine(battleView.ShowDamageEffect(50, true, isPlayerAttacking));
@@ -433,7 +443,7 @@ public class BattleManager : MonoBehaviour
         {
             NextTurn();
             StartCoroutine(ScapingTime());
-            if(randomBattle || IsDinnieBattle)
+            if(randomBattle || dinniesBattle)
                 OnBattleEnd?.Invoke(this, EventArgs.Empty);
         }
         else
@@ -453,13 +463,13 @@ public class BattleManager : MonoBehaviour
         
         battleView.ClearItemsMenu();
 
-        foreach (ItemManager item in Inventory.instance.GetItemsList())
+        foreach (ItemsManager item in Inventory.instance.GetItemsList())
         {
             battleView.CreateItemButton(item);
         }
     }
 
-    public void SelectedItemToUse(ItemManager itemToUse)
+    public void SelectedItemToUse(ItemsManager itemToUse)
     {
         selectedItem = itemToUse;
         battleView.SelectItem(itemToUse);
@@ -470,48 +480,48 @@ public class BattleManager : MonoBehaviour
         activeCharacters[selectedPlayer].UseItemInBattle(selectedItem);
         Inventory.instance.RemoveItem(selectedItem);
         
-        StartCoroutine(battleView.ShowLog($"{activeCharacters[currentTurn].CharacterName} uses {selectedItem.ItemName} and heals {selectedItem.AmountOfAffect} health points."));
+        StartCoroutine(battleView.ShowLog($"{activeCharacters[currentTurn].characterName} usa {selectedItem.name} y se cura {selectedItem.amountOfAffect} puntos de vida."));
         
         bool isPlayerAttacking = currentTurn == 0;
-        StartCoroutine(battleView.ShowDamageEffect(selectedItem.AmountOfAffect, true, isPlayerAttacking));
+        StartCoroutine(battleView.ShowDamageEffect(selectedItem.amountOfAffect, true, isPlayerAttacking));
         
         battleView.UpdatePlayerStats(activeCharacters);
         UpdateItemsInInventory();
         battleView.ShowItemsMenu(false);
         
-        if (activeCharacters[0].IsPlayer)
+        if (activeCharacters[0].IsPlayer())
         {
-            CheckAmmoStatus(activeCharacters[0].EquippedRangeWeapon);
-            battleView.UpdateAmmo(activeCharacters[0].EquippedRangeWeapon);
+            CheckAmmoStatus(activeCharacters[0].equipedRangeWeapon);
+            battleView.UpdateAmmo(activeCharacters[0].equipedRangeWeapon);
         }
 
         NextTurn();
     }
 
-    private void CheckAmmoStatus(ItemManager equipedRangeWeapon)
+    private void CheckAmmoStatus(ItemsManager equipedRangeWeapon)
     {
         if (equipedRangeWeapon != null)
         {
-            switch (equipedRangeWeapon.WeaponType)
+            switch (equipedRangeWeapon.itemName)
             {
-                case WeaponType.Escopeta:
-                    Inventory.instance.HasAmmo = Inventory.instance.ShotgunAmmo > 0;
+                case "Escopeta":
+                    Inventory.instance.hasAmmo = Inventory.instance.shotgunAmmo > 0;
                     break;
-                case WeaponType.Subfusil:
-                    Inventory.instance.HasAmmo = Inventory.instance.SmgAmmo > 0;
+                case "Subfusil":
+                    Inventory.instance.hasAmmo = Inventory.instance.SMGAmmo > 0;
                     break;
-                case WeaponType.Pistola:
-                    Inventory.instance.HasAmmo = Inventory.instance.PistolAmmo > 0;
+                case "Pistola":
+                    Inventory.instance.hasAmmo = Inventory.instance.pistolAmmo > 0;
                     break;
             }
         }
         else
         {
-            Inventory.instance.HasAmmo = false;
+            Inventory.instance.hasAmmo = false;
         }
     }
 
-    private IEnumerator ScapingTime()
+    IEnumerator ScapingTime()
     {
         if (!randomBattle) enemyCollider.enabled = false;
         StartCoroutine(battleView.ShowLog("Intentas escapar y lo logras."));
@@ -523,8 +533,8 @@ public class BattleManager : MonoBehaviour
 
     private void EndBattle()
     {
-        GameManager.instance.Player.SetActive(true);
-        GameManager.instance.BattleIsActive = false;
+        GameManager.instance.player.SetActive(true);
+        GameManager.instance.battleIsActive = false;
         isBattleActive = false;
         worldCamera.gameObject.SetActive(true);
         battleCamera.gameObject.SetActive(false);
@@ -537,7 +547,7 @@ public class BattleManager : MonoBehaviour
             StartCoroutine(randomCombat.Inmunity());
         }        
         combatSong.Stop();
-        combatSong.clip = MusicManager.instance.ActiveClip;
+        combatSong.clip = MusicManager.instance.activeClip;
         combatSong.Play();
     }
 }

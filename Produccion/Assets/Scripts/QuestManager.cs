@@ -6,16 +6,15 @@ using UnityEngine;
 
 public class QuestManager : MonoBehaviour
 {
-    [SerializeField] private string[] questNames;
-    [SerializeField] private string[] questDescriptions;
-    [SerializeField] private bool[] completedQuests;
+
+    [SerializeField] string[] questNames;
+    [SerializeField] string[] questDescriptions;
+    public bool[] questCompleted;
 
     public static QuestManager instance;
 
-    [SerializeField] private GameObject missionCompletedUi;
-    [SerializeField] private TextMeshProUGUI newObjective;
-
-    public bool[] CompletedQuests { get => completedQuests; set => completedQuests = value; }
+    [SerializeField] GameObject MissionCompletedUI;
+    [SerializeField] TextMeshProUGUI newObjective;
 
     private void Awake()
     {
@@ -26,7 +25,7 @@ public class QuestManager : MonoBehaviour
 
     void Start()
     {
-        completedQuests = new bool[questNames.Length];
+        questCompleted = new bool[questNames.Length];
     }
 
     public int GetQuestNumber(string questToFind)
@@ -47,32 +46,47 @@ public class QuestManager : MonoBehaviour
     {
         int questNumberToCheck = GetQuestNumber(questToCheck);
 
-        return completedQuests[questNumberToCheck];
+        return questCompleted[questNumberToCheck];
     }
+
+    //public void UpdateQuestObjects()
+    //{
+    //    QuestObject[] questObjects = FindObjectsOfType<QuestObject>();
+
+    //    if(questObjects.Length > 0)
+    //    {
+    //        foreach(QuestObject questObject in questObjects)
+    //        {
+    //            questObject.CheckForCompletion();
+    //        }
+    //    }
+    //}
 
     public void MarkQuestComplete(string questToMark)
     {
         int questNumberToCheck = GetQuestNumber(questToMark);
-        completedQuests[questNumberToCheck] = true;
+        questCompleted[questNumberToCheck] = true;
 
         if(questToMark != "a")
             StartCoroutine(ShowUI());
+        //OnQuestMarked?.Invoke(this, EventArgs.Empty);
+        //UpdateQuestObjects();
     }
 
     IEnumerator ShowUI()
     {
-        missionCompletedUi.SetActive(true);
+        MissionCompletedUI.SetActive(true);
         int currentMission = GetObjectiveDescription();
         newObjective.text = questDescriptions[currentMission];
         yield return new WaitForSeconds(6.5f);
-        missionCompletedUi.SetActive(false);
+        MissionCompletedUI.SetActive(false);
     }
 
     int GetObjectiveDescription()
     {
-        for(int i = 0; i < completedQuests.Length; i++)
+        for(int i = 0; i < questCompleted.Length; i++)
         {
-            if (!completedQuests[i]) return i;
+            if (!questCompleted[i]) return i;
         }
 
         return 0;
