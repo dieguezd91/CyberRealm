@@ -11,12 +11,19 @@ public class CVSReader : MonoBehaviour
 
     public class Enemy
     {
-        public string enemigo;        
-        public int  strength;
-        public int dexterity;
-        public int defence;
-        public float critical;
-        public float evasion;
+        [SerializeField] private string enemigo;        
+        [SerializeField] private int strength;
+        [SerializeField] private int dexterity;
+        [SerializeField] private int defence;
+        [SerializeField] private float critical;
+        [SerializeField] private float evasion;
+
+        public string Enemigo { get => enemigo; set => enemigo = value; }
+        public int Strength { get => strength; set => strength = value; }
+        public int Dexterity { get => dexterity; set => dexterity = value; }
+        public int Defence { get => defence; set => defence = value; }
+        public float Critical { get => critical; set => critical = value; }
+        public float Evasion { get => evasion; set => evasion = value; }
     }
 
     [System.Serializable]
@@ -44,12 +51,12 @@ public class CVSReader : MonoBehaviour
         for(int i = 0; i < tableSize; i++)
         {
             enemyList.enemy[i] = new Enemy();
-            enemyList.enemy[i].enemigo = data[6 * (i + 1)];
-            enemyList.enemy[i].strength = int.Parse(data[6 * (i + 1) + 1]);
-            enemyList.enemy[i].dexterity = int.Parse(data[6 * (i + 2) + 1]);
-            enemyList.enemy[i].defence = int.Parse(data[6 * (i + 3) + 1]);
-            enemyList.enemy[i].critical = float.Parse(data[6 * (i + 4) + 1]);
-            enemyList.enemy[i].evasion = float.Parse(data[6 * (i + 5) + 1]);
+            enemyList.enemy[i].Enemigo = data[6 * (i + 1)];
+            enemyList.enemy[i].Strength = int.Parse(data[6 * (i + 1) + 1]);
+            enemyList.enemy[i].Dexterity = int.Parse(data[6 * (i + 2) + 1]);
+            enemyList.enemy[i].Defence = int.Parse(data[6 * (i + 3) + 1]);
+            enemyList.enemy[i].Critical = float.Parse(data[6 * (i + 4) + 1]);
+            enemyList.enemy[i].Evasion = float.Parse(data[6 * (i + 5) + 1]);
         }
     }
 }

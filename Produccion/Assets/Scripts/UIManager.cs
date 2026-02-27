@@ -6,44 +6,49 @@ using UnityEngine.UI;
 
 public class UIManager: MonoBehaviour
 {
-    public GameObject pauseMenu;
-    public GameObject optionsMenu;
-    public GameObject UI;
-    public GameObject mainMenu;
+    [SerializeField] private GameObject pauseMenu;
+    [SerializeField] private GameObject optionsMenu;
+    [SerializeField] private GameObject uiContainer;
+    [SerializeField] private GameObject mainMenu;
 
-    public Image lifeBar;
-    public Image magicBar;
-    public Image XPBar;
-    public Text credits;
-    public Text level;
+    [SerializeField] private Image healthBar;
+    [SerializeField] private Image magicBar;
+    [SerializeField] private Image xpBar;
+    [SerializeField] private Text creditsText;
+    [SerializeField] private Text levelText;
 
-    public void UpdateStatBars(float currentLife, float maxLife, float currentMagic, float maxMagic, float currentXP, float maxXP)
+    public GameObject PauseMenu => pauseMenu;
+    public GameObject OptionsMenu => optionsMenu;
+    public GameObject UiContainer => uiContainer;
+    public GameObject MainMenu => mainMenu;
+
+    public void UpdateStatBars(float currentHealth, float maxHealth, float currentMagic, float maxMagic, float currentXp, float maxXp)
     {
-        lifeBar.fillAmount = currentLife/maxLife;
+        healthBar.fillAmount = currentHealth / maxHealth;
         magicBar.fillAmount = currentMagic / maxMagic;
-        XPBar.fillAmount = currentXP / maxXP;
+        xpBar.fillAmount = currentXp / maxXp;
     }
 
     public void UpdateCredits(int currentCredits)
     {
-        credits.text = currentCredits.ToString();
+        creditsText.text = currentCredits.ToString();
     }
 
     public void UpdateLevel(int currentLevel)
     {
-        level.text = "Level: " + currentLevel.ToString();
+        levelText.text = "Level: " + currentLevel.ToString();
     }
 
     public void OpenPauseMenu()
     {
         pauseMenu.SetActive(true);
-        UI.SetActive(false);
+        uiContainer.SetActive(false);
     }
 
     public void Resume()
     {
         pauseMenu.SetActive(false);
-        UI.SetActive(true);
+        uiContainer.SetActive(true);
     }
 
     public void OpenOptionsMenu()

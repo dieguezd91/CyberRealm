@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class StoreScript : MonoBehaviour
 {
-    [SerializeField] List<ItemsManager> itemInfo;
+    [SerializeField] List<ItemManager> itemInfo;
     [SerializeField] GameObject storeItemTemplate;
     Inventory playerInventory;
     [SerializeField] TextMeshProUGUI credits;
@@ -21,9 +21,9 @@ public class StoreScript : MonoBehaviour
         {
             itemTemplate.playerInventory = playerInventory;
             itemTemplate.item = item;
-            itemTemplate.iconImage.sprite = item.icon;
-            itemTemplate.objectName.text = item.itemName;
-            itemTemplate.priceTag.text = item.valueCoins.ToString();
+            itemTemplate.iconImage.sprite = item.Icon;
+            itemTemplate.objectName.text = item.ItemName;
+            itemTemplate.priceTag.text = item.ValueCoins.ToString();
 
             Instantiate(itemTemplate, transform);
         }
@@ -31,6 +31,6 @@ public class StoreScript : MonoBehaviour
 
     private void Update()
     {
-        credits.text = Inventory.instance.credits.ToString();
+        credits.text = Inventory.instance.Credits.ToString();
     }
 }

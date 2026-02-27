@@ -27,40 +27,40 @@ public class CombatButtonsHandler : MonoBehaviour
 
     void EnableOrDisableButtons()
     {
-        if (BattleManager.instance.bossBattle || BattleManager.instance.dinniesBattle || GameManager.instance.tutorial)
+        if (BattleManager.instance.BossBattle || BattleManager.instance.IsDinnieBattle || GameManager.instance.Tutorial)
             runButton.interactable = false;
-        else if (BattleManager.instance.randomBattle)
+        else if (BattleManager.instance.RandomBattle)
             runButton.interactable = true;
 
-        if (PlayerStats.instance.equipedRangeWeapon != null && Inventory.instance.hasAmmo == true) rangeButton.interactable = true;
+        if (PlayerStats.instance.EquippedRangeWeapon != null && Inventory.instance.HasAmmo == true) rangeButton.interactable = true;
         else rangeButton.interactable = false;
     }
 
 
     void ChangeAttackButtonsSprite()
     {
-        if (PlayerStats.instance.equipedMeleeWeapon == null)
+        if (PlayerStats.instance.EquippedMeleeWeapon == null)
         {
             meleeButtonImage.sprite = fistSprite;
         }
         else
         {
-            switch (PlayerStats.instance.equipedMeleeWeapon.itemName)
+            switch (PlayerStats.instance.EquippedMeleeWeapon.WeaponType)
             {
-                case "Cuchillo":
+                case WeaponType.Cuchillo:
                     meleeButtonImage.sprite = knifeSprite;
                     break;
-                case "Bate":
+                case WeaponType.Bate:
                     meleeButtonImage.sprite = batSprite;
                     break;
-                case "Katana":
+                case WeaponType.Katana:
                     meleeButtonImage.sprite = katanaSprite;
                     break;
             }
         }
         meleeButtonImage.SetNativeSize();
 
-        if(PlayerStats.instance.equipedRangeWeapon == null)
+        if(PlayerStats.instance.EquippedRangeWeapon == null)
         {
             rangeButtonImage.sprite = null;
             rangeButtonImage.color = Color.clear;
@@ -68,15 +68,15 @@ public class CombatButtonsHandler : MonoBehaviour
         else
         {
             rangeButtonImage.color = Color.white;
-            switch (PlayerStats.instance.equipedRangeWeapon.itemName)
+            switch (PlayerStats.instance.EquippedRangeWeapon.WeaponType)
             {
-                case "Pistola":
+                case WeaponType.Pistola:
                     rangeButtonImage.sprite = pistolSprite;
                     break;
-                case "Subfusil":
+                case WeaponType.Subfusil:
                     rangeButtonImage.sprite = SMGSprite;
                     break;
-                case "Escopeta":
+                case WeaponType.Escopeta:
                     rangeButtonImage.sprite = shotgunSprite;
                     break;
             }

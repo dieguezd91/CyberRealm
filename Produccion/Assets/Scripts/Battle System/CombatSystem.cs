@@ -5,8 +5,8 @@ public class CombatSystem
 {
     public int CalculateMeleeDamage(BattleCharacters attacker, BattleCharacters defender)
     {
-        float attackPower = attacker.strength + attacker.meleeWeaponDamage;
-        float defenceAmount = defender.defence;
+        float attackPower = attacker.Strength + attacker.MeleeWeaponDamage;
+        float defenceAmount = defender.Defence;
         float damageAmount = (attackPower - defenceAmount) * Random.Range(0.8f, 1.2f);
 
         int damageToGive = Mathf.Max(0, (int)damageAmount);
@@ -15,8 +15,8 @@ public class CombatSystem
 
     public int CalculateRangeDamage(BattleCharacters attacker, BattleCharacters defender)
     {
-        float attackPower = attacker.dexterity + attacker.rangeWeaponDamage;
-        float defenceAmount = defender.defence;
+        float attackPower = attacker.Dexterity + attacker.RangeWeaponDamage;
+        float defenceAmount = defender.Defence;
         float damageAmount = (attackPower - defenceAmount) * Random.Range(0.8f, 1.2f);
 
         int damageToGive = Mathf.Max(0, (int)damageAmount);
@@ -34,17 +34,17 @@ public class CombatSystem
 
     public AttackType DecideEnemyAttack(BattleCharacters enemy)
     {
-        if (enemy.availableAttacks == null || enemy.availableAttacks.Length == 0)
+        if (enemy.AvailableAttacks == null || enemy.AvailableAttacks.Length == 0)
             return AttackType.Melee;
 
-        if (enemy.availableAttacks.Length == 3)
+        if (enemy.AvailableAttacks.Length == 3)
         {
             int n = Random.Range(1, 10);
             if (n == 9) return AttackType.Heal;
             if (n >= 5) return AttackType.Range;
             return AttackType.Melee;
         }
-        else if (enemy.availableAttacks.Length == 2)
+        else if (enemy.AvailableAttacks.Length == 2)
         {
             int i = Random.Range(1, 10);
             if (i <= 5) return AttackType.Range;
@@ -52,7 +52,7 @@ public class CombatSystem
         }
         else
         {
-            return enemy.availableAttacks[0];
+            return enemy.AvailableAttacks[0];
         }
     }
 
@@ -61,7 +61,7 @@ public class CombatSystem
         List<int> players = new List<int>();
         for (int n = 0; n < activeCharacters.Count; n++)
         {
-            if (activeCharacters[n].IsPlayer() && activeCharacters[n].currentHP > 0)
+            if (activeCharacters[n].IsPlayer && activeCharacters[n].CurrentHealth > 0)
             {
                 players.Add(n);
             }

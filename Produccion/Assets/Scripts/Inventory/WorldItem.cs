@@ -6,22 +6,22 @@ using UnityEngine;
 
 public class WorldItem : MonoBehaviour
 {
-    [SerializeField] ItemsManager item;
+    [SerializeField] ItemManager item;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
             gameObject.SetActive(false);
-            if (item.itemType == ItemsManager.ItemType.Ammo)
+            if (item.Type == ItemManager.ItemType.Ammo)
             {
                 item.UseItem(0);
             }
 
             else
-                Inventory.instance.AddItems(item);
-            //int index = CollectedItemsManager.instance.GetItemNumber(gameObject);
-            //CollectedItemsManager.instance.collected[index] = true;
+                Inventory.instance.AddItem(item);
+            //int index = CollectedItemManager.instance.GetItemNumber(gameObject);
+            //CollectedItemManager.instance.collected[index] = true;
         }
     }
 }

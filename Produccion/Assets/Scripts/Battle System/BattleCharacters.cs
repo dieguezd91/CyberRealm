@@ -4,78 +4,95 @@ using UnityEngine;
 
 public class BattleCharacters : MonoBehaviour
 {
-    [SerializeField] bool isPlayer;
-    [SerializeField] public AttackType[] availableAttacks;
+    [SerializeField] private bool isPlayer;
+    [SerializeField] private AttackType[] availableAttacks;
 
-    public string characterName;
-    public int currentHP, maxHP, dexterity, strength, defence, meleeWeaponDamage, rangeWeaponDamage;
-    public bool isDead;
-    public int level;
+    [SerializeField] private string characterName;
+    [SerializeField] private EnemyType enemyType;
+    [SerializeField] private int currentHealth;
+    [SerializeField] private int maxHealth;
+    [SerializeField] private int dexterity;
+    [SerializeField] private int strength;
+    [SerializeField] private int defence;
+    [SerializeField] private int meleeWeaponDamage;
+    [SerializeField] private int rangeWeaponDamage;
+    [SerializeField] private bool isDead;
+    [SerializeField] private int level;
 
-    public ItemsManager equipedRangeWeapon, equipedMeleeWeapon;
+    [SerializeField] private ItemManager equippedRangeWeapon;
+    [SerializeField] private ItemManager equippedMeleeWeapon;
 
+    public bool IsPlayer => isPlayer;
+    public AttackType[] AvailableAttacks => availableAttacks;
+    public string CharacterName => characterName;
+    public EnemyType EnemyType => enemyType;
+    public int CurrentHealth => currentHealth;
+    public int MaxHealth => maxHealth;
+    public int Dexterity => dexterity;
+    public int Strength => strength;
+    public int Defence => defence;
+    public int MeleeWeaponDamage => meleeWeaponDamage;
+    public int RangeWeaponDamage => rangeWeaponDamage;
+    public bool IsDead => isDead;
+    public int Level => level;
+    public ItemManager EquippedRangeWeapon => equippedRangeWeapon;
+    public ItemManager EquippedMeleeWeapon => equippedMeleeWeapon;
 
-    private void Update()
+    private void Awake()
     {
-        
-    }
-
-    public bool IsPlayer()
-    {
-        return isPlayer;
-    }
-
-    public AttackType[] AttackMovesAvailable()
-    {
-        return availableAttacks;
-    }
-
-    /*public void TakeHPMeleeDamage(int meleeDamageToReceive)
-    {
-        currentHP -= meleeDamageToReceive;
-
-        if(currentHP < 0)
+        if (enemyType == EnemyType.None && !string.IsNullOrEmpty(characterName) && !isPlayer)
         {
-            currentHP = 0;
-        }
-    }*/
-    
-    public void TakeHPDamage(int damageToReceive)
-    {
-        currentHP -= damageToReceive;
-
-        if(currentHP < 0)
-        {
-            currentHP = 0;
+            enemyType = CombatEnumAdapter.GetEnemyType(characterName);
         }
     }
 
-    public void UseItemInBattle(ItemsManager itemToUse)
+    public void TakeDamage(int damage)
     {
-        if(itemToUse.itemType == ItemsManager.ItemType.Item)
+        currentHealth -= damage;
+        if (currentHealth < 0) currentHealth = 0;
+        if (currentHealth == 0) isDead = true;
+    }
+
+    public void SetStats(int hp, int maxHp, int lvl, int dex, int str, int def, int meleeDmg, int rangeDmg)
+    {
+        currentHealth = hp;
+        maxHealth = maxHp;
+        level = lvl;
+        dexterity = dex;
+        strength = str;
+        defence = def;
+        meleeWeaponDamage = meleeDmg;
+        rangeWeaponDamage = rangeDmg;
+    }
+
+    public void SetEquippedWeapons(ItemManager melee, ItemManager range)
+    {
+        equippedMeleeWeapon = melee;
+        equippedRangeWeapon = range;
+    }
+
+    public void UseItemInBattle(ItemManager itemToUse)
+    {
+        if(itemToUse.Type == ItemManager.ItemType.Item)
         {
-            if(itemToUse.affectType == ItemsManager.AffectType.HP)
+            if(itemToUse.Affect == ItemManager.AffectType.HP)
             {
-                    AddHP(itemToUse.amountOfAffect);
+                    AddHealth(itemToUse.AmountOfAffect);
             }            
         }
-        else if(itemToUse.itemType == ItemsManager.ItemType.MeleeWeapon)
+        else if(itemToUse.Type == ItemManager.ItemType.MeleeWeapon)
         {
-            PlayerStats.instance.equipedMeleeWeapon = itemToUse;
-            PlayerStats.instance.meleeDamage = itemToUse.weaponStrength;
-            PlayerStats.instance.equippedMeleeWeaponName = itemToUse.name;
+            PlayerStats.instance.EquipMeleeWeapon(itemToUse);
         }
-        else if(itemToUse.itemType == ItemsManager.ItemType.RangeWeapon)
+        else if(itemToUse.Type == ItemManager.ItemType.RangeWeapon)
         {
-            PlayerStats.instance.equipedRangeWeapon = itemToUse;
-            PlayerStats.instance.rangeDamage = itemToUse.weaponDexterity;
-            PlayerStats.instance.equippedRangeWeaponName = itemToUse.name;
+            PlayerStats.instance.EquipRangeWeapon(itemToUse);
         }
     }
 
-    public void AddHP(int amountOfAffect)
+    public void AddHealth(int amount)
     {
-        currentHP += amountOfAffect;
-        if (currentHP > maxHP) currentHP = maxHP;
+        currentHealth += amount;
+        if (currentHealth > maxHealth) currentHealth = maxHealth;
     }
 }

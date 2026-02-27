@@ -10,7 +10,7 @@ public class BedScript : MonoBehaviour
 
     private void Start()
     {
-        player = GameManager.instance.player.GetComponent<PlayerStats>();
+        player = GameManager.instance.Player.GetComponent<PlayerStats>();
         HPRestoredSign = MenuManager.instance.rewardsTexts.lifeRestoredText;
     }
 
@@ -18,7 +18,7 @@ public class BedScript : MonoBehaviour
     {
         if(pjNearBy && Input.GetKeyDown(KeyCode.Space))
         {
-            player.currentHP = player.maxHP;
+            player.HealFull();
             StartCoroutine(ShowSign());
         }
     }

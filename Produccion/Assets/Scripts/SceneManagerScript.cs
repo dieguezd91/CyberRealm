@@ -7,9 +7,12 @@ using UnityEngine.SceneManagement;
 public class SceneManagerScript : MonoBehaviour
 {
     public static SceneManagerScript instance;
-    public string scene;
+    [SerializeField] private string currentScene;
 
-    public Vector2 spawnpoint;
+    [SerializeField] private Vector2 spawnpoint;
+
+    public string CurrentScene { get => currentScene; set => currentScene = value; }
+    public Vector2 Spawnpoint => spawnpoint;
 
     private void Awake()
     {
@@ -26,17 +29,17 @@ public class SceneManagerScript : MonoBehaviour
     public void LoadScene(string newScene)
     {
         Debug.Log(newScene + " loaded");
-        MusicManager.instance.audioSource.Stop();
-        scene = newScene;
+        MusicManager.instance.AudioSource.Stop();
+        currentScene = newScene;
         CheckActiveClip();
-        MusicManager.instance.audioSource.clip = MusicManager.instance.activeClip;
-        MusicManager.instance.audioSource.Play();
+        MusicManager.instance.AudioSource.clip = MusicManager.instance.ActiveClip;
+        MusicManager.instance.AudioSource.Play();
         if (newScene == "Fabrica" || newScene == "Central de seguridad" || newScene == "Omni-Tech")
-            AudioManager.instance.lockedUpSFX.enabled = true;
-        else AudioManager.instance.lockedUpSFX.enabled = false;
+            AudioManager.instance.LockedUpSfx.enabled = true;
+        else AudioManager.instance.LockedUpSfx.enabled = false;
         if (newScene == "MainMenu")
         {
-            Destroy(GameManager.instance.player);
+            Destroy(GameManager.instance.Player);
             Destroy(GameManager.instance.gameObject);
             Destroy(QuestManager.instance.gameObject);
             Destroy(BattleManager.instance.gameObject);
@@ -54,31 +57,31 @@ public class SceneManagerScript : MonoBehaviour
     }
     void CheckActiveClip()
     {
-        switch (scene)
+        switch (currentScene)
         {
             case "MainMenu":
-                MusicManager.instance.activeClip = MusicManager.instance.songs[6];
+                MusicManager.instance.ActiveClip = MusicManager.instance.Songs[6];
                 break;
             case "Bar":
-                MusicManager.instance.activeClip = MusicManager.instance.songs[1];
+                MusicManager.instance.ActiveClip = MusicManager.instance.Songs[1];
                 break;
             case "Garage":
-                MusicManager.instance.activeClip = MusicManager.instance.songs[5];
+                MusicManager.instance.ActiveClip = MusicManager.instance.Songs[5];
                 break;
             case "Ciudad":
-                MusicManager.instance.activeClip = MusicManager.instance.songs[0];
+                MusicManager.instance.ActiveClip = MusicManager.instance.Songs[0];
                 break;
             case "Store":
-                MusicManager.instance.activeClip = MusicManager.instance.songs[0];
+                MusicManager.instance.ActiveClip = MusicManager.instance.Songs[0];
                 break;
             case "Fabrica":
-                MusicManager.instance.activeClip = MusicManager.instance.songs[2];
+                MusicManager.instance.ActiveClip = MusicManager.instance.Songs[2];
                 break;
             case "Central de seguridad":
-                MusicManager.instance.activeClip = MusicManager.instance.songs[4];
+                MusicManager.instance.ActiveClip = MusicManager.instance.Songs[4];
                 break;
             case "Omni-Tech":
-                MusicManager.instance.activeClip = MusicManager.instance.songs[3];
+                MusicManager.instance.ActiveClip = MusicManager.instance.Songs[3];
                 break;
             default:
                 break;

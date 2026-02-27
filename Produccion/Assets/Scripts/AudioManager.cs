@@ -8,17 +8,19 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance;
 
-    public AudioSource audioSource;
-    public AudioSource lockedUpSFX;
-    float volume;
-    public Slider volumeSlider;
-    [SerializeField] AudioClip punchSFX;
-    [SerializeField] AudioClip knifeSFX;
-    [SerializeField] AudioClip batSFX;
-    [SerializeField] AudioClip katanaSFX;
-    [SerializeField] AudioClip pistolSFX;
-    [SerializeField] AudioClip SMGSFX;
-    [SerializeField] AudioClip shotgunSFX;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioSource lockedUpSfx;
+    private float volume;
+    [SerializeField] private Slider volumeSlider;
+    [SerializeField] private AudioClip punchSfx;
+    [SerializeField] private AudioClip knifeSfx;
+    [SerializeField] private AudioClip batSfx;
+    [SerializeField] private AudioClip katanaSfx;
+    [SerializeField] private AudioClip pistolSfx;
+    [SerializeField] private AudioClip smgSfx;
+    [SerializeField] private AudioClip shotgunSfx;
+
+    public AudioSource LockedUpSfx => lockedUpSfx;
 
     private void Awake()
     {
@@ -50,21 +52,21 @@ public class AudioManager : MonoBehaviour
         audioSource.Play();
     }
 
-    public void selectRangeAttackSFX(ItemsManager weapon)
+    public void SelectRangeAttackSfx(ItemManager weapon)
     {
         AudioClip clip;
-        switch (weapon.itemName)
+        switch (weapon.WeaponType)
         {
-            case "Pistola":
-                clip = pistolSFX;
+            case WeaponType.Pistola:
+                clip = pistolSfx;
                 PlaySound(clip);
                 break;
-            case "Subfusil":
-                clip = SMGSFX;
+            case WeaponType.Subfusil:
+                clip = smgSfx;
                 PlaySound(clip);
                 break;
-            case "Escopeta":
-                clip = shotgunSFX;
+            case WeaponType.Escopeta:
+                clip = shotgunSfx;
                 PlaySound(clip);
                 break;
             default:
@@ -72,28 +74,29 @@ public class AudioManager : MonoBehaviour
                 break;
         }
     }
-    public void SelectMeleeAttackSFX(ItemsManager weapon)
+
+    public void SelectMeleeAttackSfx(ItemManager weapon)
     {
         AudioClip clip;
         if(weapon == null)
         {
-            clip = punchSFX;
+            clip = punchSfx;
             PlaySound(clip);
         }
         else
         {
-            switch (weapon.itemName)
+            switch (weapon.WeaponType)
             {
-                case "Cuchillo":
-                    clip = knifeSFX;
+                case WeaponType.Cuchillo:
+                    clip = knifeSfx;
                     PlaySound(clip);
                     break;
-                case "Bate":
-                    clip = batSFX;
+                case WeaponType.Bate:
+                    clip = batSfx;
                     PlaySound(clip);
                     break;
-                case "Katana":
-                    clip = katanaSFX;
+                case WeaponType.Katana:
+                    clip = katanaSfx;
                     PlaySound(clip);
                     break;
                 default:

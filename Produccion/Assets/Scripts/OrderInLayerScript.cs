@@ -13,7 +13,7 @@ public class OrderInLayerScript : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.instance.player.transform.position.y < transform.position.y) spriteRenderer.sortingOrder = -1;
+        if (GameManager.instance.Player.transform.position.y < transform.position.y) spriteRenderer.sortingOrder = -1;
         else spriteRenderer.sortingOrder = 1;
     }
 }

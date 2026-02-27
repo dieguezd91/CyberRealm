@@ -17,9 +17,7 @@ public class RandomBattle : MonoBehaviour
         if (collider.CompareTag("Player"))
         {
             int i = UnityEngine.Random.Range(1, 101);
-            string enemy;
-            if (i <= 5) enemy = "Vagabundo";
-            else enemy = "Traficante";
+            EnemyType enemy = (i <= 5) ? EnemyType.Vagabundo : EnemyType.Traficante;
 
             if ( i <= 10)
             {

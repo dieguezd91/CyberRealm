@@ -28,8 +28,8 @@ public class DialogueManager : MonoBehaviour
 
     public void Start()
     {
-        player = GameManager.instance.player.GetComponent<PlayerController>();
-        animator = GameManager.instance.player.GetComponent<Animator>();
+        player = GameManager.instance.Player.GetComponent<PlayerController>();
+        animator = GameManager.instance.Player.GetComponent<Animator>();
         dialogueText.text = string.Empty;
         StartDialogue();
         if(disableAfter)
@@ -54,10 +54,10 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue()
     {
-        lastSpeed = player.moveSpeed;
-        player.moveSpeed = 0;
+        lastSpeed = player.MoveSpeed;
+        player.MoveSpeed = 0;
         MenuManager.instance.menu.SetActive(false);
-        GameManager.instance.chatting = true;
+        GameManager.instance.Chatting = true;
         //animator.enabled = false;
         dialogueText.text = string.Empty;
         index = 0;
@@ -95,8 +95,8 @@ public class DialogueManager : MonoBehaviour
         gameObject.SetActive(false);
         if (objectToDisable != null)
             objectToDisable.SetActive(false);
-        player.moveSpeed = lastSpeed;
-        GameManager.instance.chatting = false;
+        player.MoveSpeed = lastSpeed;
+        GameManager.instance.Chatting = false;
         //animator.enabled = true;
     }
 }

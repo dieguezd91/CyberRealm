@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PuertasDungeon : MonoBehaviour
+public class DungeonDoors : MonoBehaviour
 {
-    [SerializeField] GameObject door;
-    [SerializeField] GameObject item;
+    [SerializeField] private GameObject door;
+    [SerializeField] private GameObject item;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

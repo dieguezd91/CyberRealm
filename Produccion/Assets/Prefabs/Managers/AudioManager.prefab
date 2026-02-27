@@ -175,15 +175,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 6739592818589577399}
-  lockedUpSFX: {fileID: 3049642395088880294}
+  lockedUpSfx: {fileID: 3049642395088880294}
   volumeSlider: {fileID: 0}
-  punchSFX: {fileID: 8300000, guid: b857453491cd02a498344b020cc6530e, type: 3}
-  knifeSFX: {fileID: 8300000, guid: 30d32a32685bee5469cd15054da9a130, type: 3}
-  batSFX: {fileID: 8300000, guid: 06a0c355e3259e34e9cdc3915ee86992, type: 3}
-  katanaSFX: {fileID: 8300000, guid: 619b8b7fa2e94704a8f7144bfa2a1fda, type: 3}
-  pistolSFX: {fileID: 8300000, guid: dab36a22d67d27c4d8af1a9548b1e19f, type: 3}
-  SMGSFX: {fileID: 8300000, guid: 213dd155ee7b20847a9a8781667c475b, type: 3}
-  shotgunSFX: {fileID: 8300000, guid: 9d6647fd58dda634a8a8d321fc89ee81, type: 3}
+  punchSfx: {fileID: 8300000, guid: b857453491cd02a498344b020cc6530e, type: 3}
+  knifeSfx: {fileID: 8300000, guid: 30d32a32685bee5469cd15054da9a130, type: 3}
+  batSfx: {fileID: 8300000, guid: 06a0c355e3259e34e9cdc3915ee86992, type: 3}
+  katanaSfx: {fileID: 8300000, guid: 619b8b7fa2e94704a8f7144bfa2a1fda, type: 3}
+  pistolSfx: {fileID: 8300000, guid: dab36a22d67d27c4d8af1a9548b1e19f, type: 3}
+  smgSfx: {fileID: 8300000, guid: 213dd155ee7b20847a9a8781667c475b, type: 3}
+  shotgunSfx: {fileID: 8300000, guid: 9d6647fd58dda634a8a8d321fc89ee81, type: 3}
 --- !u!82 &6739592818589577399
 AudioSource:
   m_ObjectHideFlags: 0

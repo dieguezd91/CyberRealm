@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PauseMenuScript : MonoBehaviour
 {
-    private gameDataController dataManager;
+    private GameDataController dataManager;
 
 
 }

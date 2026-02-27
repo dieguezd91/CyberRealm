@@ -11,7 +11,7 @@ public class TemplateStoreItem : MonoBehaviour
     public TextMeshProUGUI objectName;
     public Button buyButton;
     int price;
-    public ItemsManager item;
+    public ItemManager item;
     public Inventory playerInventory;
 
 
@@ -23,7 +23,7 @@ public class TemplateStoreItem : MonoBehaviour
 
     void Update()
     {
-        if (price > playerInventory.credits)
+        if (price > playerInventory.Credits)
         {
             buyButton.interactable = false;
         }
@@ -31,46 +31,46 @@ public class TemplateStoreItem : MonoBehaviour
 
     public void BuyItem()
     {
-        playerInventory.credits -= price;
-        playerInventory.AddItems(item);
+        playerInventory.Credits -= price;
+        playerInventory.AddItem(item);
     }
 
     public void SellItem()
     {
-        if(item.itemType != ItemsManager.ItemType.Ammo)
+        if(item.Type != ItemManager.ItemType.Ammo)
         {
-            if (playerInventory.itemsList.Contains(item))
+            if (playerInventory.GetItemsList().Contains(item))
             {
-                playerInventory.credits += price;
+                playerInventory.Credits += price;
                 playerInventory.RemoveItem(item);
             }
             else Debug.Log("No posees este item");
         }
         else
         {
-            switch (item.itemName)
+            switch (item.ItemName)
             {
                 case "Balas de pistola":
-                    if (Inventory.instance.pistolAmmo >= 7)
+                    if (Inventory.instance.PistolAmmo >= 7)
                     {
-                        Inventory.instance.pistolAmmo -= 7;
-                        playerInventory.credits += price;
+                        Inventory.instance.PistolAmmo -= 7;
+                        playerInventory.Credits += price;
                     }
                     else Debug.Log("No posees este item");
                     break;
                 case "Cartuchos de escopeta":
-                    if (Inventory.instance.shotgunAmmo >= 2)
+                    if (Inventory.instance.ShotgunAmmo >= 2)
                     {
-                        Inventory.instance.shotgunAmmo -= 2;
-                        playerInventory.credits += price;
+                        Inventory.instance.ShotgunAmmo -= 2;
+                        playerInventory.Credits += price;
                     }
                     else Debug.Log("No posees este item");
                     break;
                 case "Balas de subfusil":
-                    if (Inventory.instance.SMGAmmo >= 10)
+                    if (Inventory.instance.SmgAmmo >= 10)
                     {
-                        Inventory.instance.SMGAmmo -= 10;
-                        playerInventory.credits += price;
+                        Inventory.instance.SmgAmmo -= 10;
+                        playerInventory.Credits += price;
                     }
                     else Debug.Log("No posees este item");
                     break;

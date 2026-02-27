@@ -4,17 +4,26 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject player;
     public static GameManager instance;
-    public bool battleIsActive;
-    public bool tutorial;
-    public bool respawned;
-    public bool chatting;
-    public bool inStore;
 
-    [SerializeField] PlayerStats[] playerStats;
+    [SerializeField] private GameObject playerObject;
+    [SerializeField] private bool isBattleActive;
+    [SerializeField] private bool isTutorial;
+    [SerializeField] private bool hasRespawned;
+    [SerializeField] private bool isChatting;
+    [SerializeField] private bool isInStore;
 
-    public Vector3 lastPosition;
+    [SerializeField] private PlayerStats[] playerStats;
+
+    [SerializeField] private Vector3 lastPosition;
+
+    public GameObject Player => playerObject;
+    public bool BattleIsActive { get => isBattleActive; set => isBattleActive = value; }
+    public bool Tutorial { get => isTutorial; set => isTutorial = value; }
+    public bool Respawned { get => hasRespawned; set => hasRespawned = value; }
+    public bool Chatting { get => isChatting; set => isChatting = value; }
+    public bool InStore { get => isInStore; set => isInStore = value; }
+    public Vector3 LastPosition { get => lastPosition; set => lastPosition = value; }
 
     void Awake()
     {
@@ -30,18 +39,19 @@ public class GameManager : MonoBehaviour
 
         playerStats = FindObjectsOfType<PlayerStats>();
 
-        player = GameObject.FindGameObjectWithTag("Player");    
+        playerObject = GameObject.FindGameObjectWithTag("Player");    
     }
 
     public PlayerStats[] GetPlayerStats()
     {
         return playerStats;
     }
+
     public void RespawnPlayer()
     {
         lastPosition = new Vector2(-50f, 9f);
         SceneManagerScript.instance.LoadScene("Garage");
-        respawned = true;
-        PlayerStats.instance.currentHP = PlayerStats.instance.maxHP;
+        hasRespawned = true;
+        PlayerStats.instance.HealFull();
     }
 }
