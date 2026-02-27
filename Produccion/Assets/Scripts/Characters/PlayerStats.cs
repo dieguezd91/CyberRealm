@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -11,12 +12,21 @@ public class PlayerStats : MonoBehaviour
 
     [SerializeField] private int playerLevel = 1;
     [SerializeField] private int maxLevel = 50;
+    
+    [FormerlySerializedAs("currentXP")]
     [SerializeField] private int currentXp;
+    
     [SerializeField] private int[] xpForNextLevel;
+    
+    [FormerlySerializedAs("baseLevelXP")]
     [SerializeField] private int baseLevelXp = 100;
+    
     [SerializeField] private GameObject levelUp;
 
+    [FormerlySerializedAs("maxHP")]
     [SerializeField] private int maxHealth = 100;
+    
+    [FormerlySerializedAs("currentHP")]
     [SerializeField] private int currentHealth;
 
     [SerializeField] private int dexterity;
@@ -29,7 +39,10 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private int meleeDamage;
     [SerializeField] private int rangeDamage;
 
+    [FormerlySerializedAs("equipedMeleeWeapon")]
     [SerializeField] private ItemManager equippedMeleeWeapon;
+    
+    [FormerlySerializedAs("equipedRangeWeapon")]
     [SerializeField] private ItemManager equippedRangeWeapon;
 
     [SerializeField] private FeedbackAfterCombat rewardsTexts;

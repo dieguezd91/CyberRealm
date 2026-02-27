@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Serialization;
 
 public class Inventory : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class Inventory : MonoBehaviour
     
     [SerializeField] private List<ItemManager> itemsList = new List<ItemManager>();
     [SerializeField] private int credits;
+    [FormerlySerializedAs("hasCompletedDinniesTutorial")]
     [SerializeField] private bool hasCompletedTutorial;
 
     // AMMO

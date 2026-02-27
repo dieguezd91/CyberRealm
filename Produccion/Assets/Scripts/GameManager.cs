@@ -1,16 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
+    [FormerlySerializedAs("player")]
     [SerializeField] private GameObject playerObject;
+    
+    [FormerlySerializedAs("battleIsActive")]
     [SerializeField] private bool isBattleActive;
+    
+    [FormerlySerializedAs("tutorial")]
     [SerializeField] private bool isTutorial;
+    
+    [FormerlySerializedAs("respawned")]
     [SerializeField] private bool hasRespawned;
+    
+    [FormerlySerializedAs("chatting")]
     [SerializeField] private bool isChatting;
+    
+    [FormerlySerializedAs("inStore")]
     [SerializeField] private bool isInStore;
 
     [SerializeField] private PlayerStats[] playerStats;
