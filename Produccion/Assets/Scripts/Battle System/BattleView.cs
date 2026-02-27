@@ -29,7 +29,7 @@ public class BattleView : MonoBehaviour
     [SerializeField] TextMeshProUGUI damageDealt;
     [SerializeField] TextMeshProUGUI log;
     [SerializeField] Text amountOfAmmo;
-    [SerializeField] public FeedbackAfterCombat rewardsTexts;
+    public FeedbackAfterCombat rewardsTexts;
 
     public void SetLegacyData(GameObject[] pbStats, Text[] pnText, Slider[] phSlider, 
                               GameObject[] ebStats, Text[] enText, Slider[] ehSlider,

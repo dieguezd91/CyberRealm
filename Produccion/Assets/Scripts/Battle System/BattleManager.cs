@@ -136,7 +136,7 @@ public class BattleManager : MonoBehaviour
             enemyCollider = enemyGO.GetComponent<Collider2D>();
         }
 
-        if (battleView != null) StartCoroutine(battleView.ShowLog(string.Empty));
+        StartCoroutine(battleView.ShowLog(string.Empty));
 
         if (!isBattleActive)
         {
@@ -256,12 +256,8 @@ public class BattleManager : MonoBehaviour
 
         waitingForTurn = true;
         UpdateBattle();
-        
-        if (battleView != null)
-        {
-            battleView.UpdatePlayerStats(activeCharacters);
-            battleView.UpdateEnemyStats(activeCharacters);
-        }
+        battleView.UpdatePlayerStats(activeCharacters);
+        battleView.UpdateEnemyStats(activeCharacters);
     }
 
     private void UpdateBattle()
@@ -289,25 +285,16 @@ public class BattleManager : MonoBehaviour
             if (allEnemiesAreDead)
             {
                 PlayerStats.instance.AddXp(amountOfXp);
-                if (MenuManager.instance != null) MenuManager.instance.AddCreditsUI();
+                MenuManager.instance.AddCreditsUI();
                 Inventory.instance.PistolAmmo += ammoRewards;
-                
-                if (battleView != null && battleView.rewardsTexts != null)
-                {
-                    StartCoroutine(battleView.rewardsTexts.ShowAmmoRewards(ammoRewards.ToString()));
-                }
-                else
-                {
-                    Debug.LogWarning("BattleView or rewardsTexts is missing in BattleManager!");
-                }
-
+                StartCoroutine(battleView.rewardsTexts.ShowAmmoRewards(ammoRewards.ToString()));
                 ExportPlayerStats(0);
                 if (!randomBattle) Destroy(enemyGO);
                 
                 if (randomBattle || IsDinnieBattle)
                     OnBattleEnd?.Invoke(this, EventArgs.Empty);
                     
-                if(bossBattle && battleView != null && battleView.rewardsTexts != null)
+                if(bossBattle)
                     StartCoroutine(battleView.rewardsTexts.ShowLifeRestored());
             }
             else if (allPlayersAreDead)
@@ -344,7 +331,7 @@ public class BattleManager : MonoBehaviour
 
     private void EnemyAttack()
     {
-        if (battleView != null) StartCoroutine(battleView.Shake(activeCharacters[0].GetComponent<Rigidbody2D>()));
+        StartCoroutine(battleView.Shake(activeCharacters[0].GetComponent<Rigidbody2D>()));
         
         int selectedPlayerToAttack = combatSystem.SelectRandomPlayerTarget(activeCharacters);
         if (selectedPlayerToAttack == -1) return;
@@ -364,12 +351,12 @@ public class BattleManager : MonoBehaviour
                 break;
         }
 
-        if (battleView != null) battleView.UpdatePlayerStats(activeCharacters);
+        battleView.UpdatePlayerStats(activeCharacters);
     }
 
     public void PlayerRangeAttack()
     {
-        if (battleView != null) StartCoroutine(battleView.Shake(activeCharacters[1].GetComponent<Rigidbody2D>()));
+        StartCoroutine(battleView.Shake(activeCharacters[1].GetComponent<Rigidbody2D>()));
         DealRangeDamageToCharacters(1);
         
         switch (activeCharacters[0].EquippedRangeWeapon.WeaponType)
@@ -386,7 +373,7 @@ public class BattleManager : MonoBehaviour
         }
         
         CheckAmmoStatus(activeCharacters[0].EquippedRangeWeapon);
-        if (battleView != null) battleView.UpdateAmmo(activeCharacters[0].EquippedRangeWeapon);
+        battleView.UpdateAmmo(activeCharacters[0].EquippedRangeWeapon);
         AudioManager.instance.SelectRangeAttackSfx(activeCharacters[0].EquippedRangeWeapon);
 
         NextTurn();
@@ -394,7 +381,7 @@ public class BattleManager : MonoBehaviour
 
     public void PlayerMeleeAttack()
     {
-        if (battleView != null) StartCoroutine(battleView.Shake(activeCharacters[1].GetComponent<Rigidbody2D>()));
+        StartCoroutine(battleView.Shake(activeCharacters[1].GetComponent<Rigidbody2D>()));
         DealMeleeDamageToCharacters(1);
 
         if (activeCharacters[0].EquippedRangeWeapon == null) 
@@ -412,10 +399,10 @@ public class BattleManager : MonoBehaviour
         string attackerName = activeCharacters[currentTurn].CharacterName;
         string defenderName = activeCharacters[selectedCharacterToAttack].CharacterName;
 
-        if (battleView != null) StartCoroutine(battleView.ShowLog($"{attackerName} usa ataque a rango y causa {damageToGive} de dano a {defenderName}"));
+        StartCoroutine(battleView.ShowLog($"{attackerName} usa ataque a rango y causa {damageToGive} de dano a {defenderName}"));
 
         bool isPlayerAttacking = currentTurn == 0;
-        if (battleView != null) StartCoroutine(battleView.ShowDamageEffect(damageToGive, false, isPlayerAttacking));
+        StartCoroutine(battleView.ShowDamageEffect(damageToGive, false, isPlayerAttacking));
         
         activeCharacters[selectedCharacterToAttack].TakeDamage(damageToGive);
     }
@@ -427,10 +414,10 @@ public class BattleManager : MonoBehaviour
         string attackerName = activeCharacters[currentTurn].CharacterName;
         string defenderName = activeCharacters[selectedCharacterToAttack].CharacterName;
 
-        if (battleView != null) StartCoroutine(battleView.ShowLog($"{attackerName} usa ataque melee y causa {damageToGive} de dano a {defenderName}"));
+        StartCoroutine(battleView.ShowLog($"{attackerName} usa ataque melee y causa {damageToGive} de dano a {defenderName}"));
 
         bool isPlayerAttacking = currentTurn == 0;
-        if (battleView != null) StartCoroutine(battleView.ShowDamageEffect(damageToGive, false, isPlayerAttacking));
+        StartCoroutine(battleView.ShowDamageEffect(damageToGive, false, isPlayerAttacking));
         
         activeCharacters[selectedCharacterToAttack].TakeDamage(damageToGive);
     }
@@ -438,10 +425,10 @@ public class BattleManager : MonoBehaviour
     private void Heal()
     {
         activeCharacters[currentTurn].AddHealth(50);
-        if (battleView != null) StartCoroutine(battleView.ShowLog($"{activeCharacters[currentTurn].CharacterName} heals 50 health points."));
+        StartCoroutine(battleView.ShowLog($"{activeCharacters[currentTurn].CharacterName} heals 50 health points."));
         
         bool isPlayerAttacking = currentTurn == 0;
-        if (battleView != null) StartCoroutine(battleView.ShowDamageEffect(50, true, isPlayerAttacking));
+        StartCoroutine(battleView.ShowDamageEffect(50, true, isPlayerAttacking));
     }
 
     public void RunAway()
@@ -455,7 +442,7 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            if (battleView != null) StartCoroutine(battleView.ShowLog("Intentas escapar pero fallas."));
+            StartCoroutine(battleView.ShowLog("Intentas escapar pero fallas."));
             NextTurn();
         }
         ExportPlayerStats(0);
@@ -463,8 +450,6 @@ public class BattleManager : MonoBehaviour
 
     public void UpdateItemsInInventory()
     {
-        if (battleView == null) return;
-
         if (!inventoryIsOpen && isBattleActive)
             battleView.ShowItemsMenu(true);
             
@@ -481,7 +466,7 @@ public class BattleManager : MonoBehaviour
     public void SelectedItemToUse(ItemManager itemToUse)
     {
         selectedItem = itemToUse;
-        if (battleView != null) battleView.SelectItem(itemToUse);
+        battleView.SelectItem(itemToUse);
     }
 
     public void UseItemButton(int selectedPlayer)
@@ -489,23 +474,19 @@ public class BattleManager : MonoBehaviour
         activeCharacters[selectedPlayer].UseItemInBattle(selectedItem);
         Inventory.instance.RemoveItem(selectedItem);
         
-        if (battleView != null)
-        {
-            StartCoroutine(battleView.ShowLog($"{activeCharacters[currentTurn].CharacterName} uses {selectedItem.ItemName} and heals {selectedItem.AmountOfAffect} health points."));
-            bool isPlayerAttacking = currentTurn == 0;
-            StartCoroutine(battleView.ShowDamageEffect(selectedItem.AmountOfAffect, true, isPlayerAttacking));
-            battleView.UpdatePlayerStats(activeCharacters);
-        }
-
+        StartCoroutine(battleView.ShowLog($"{activeCharacters[currentTurn].CharacterName} uses {selectedItem.ItemName} and heals {selectedItem.AmountOfAffect} health points."));
+        
+        bool isPlayerAttacking = currentTurn == 0;
+        StartCoroutine(battleView.ShowDamageEffect(selectedItem.AmountOfAffect, true, isPlayerAttacking));
+        
+        battleView.UpdatePlayerStats(activeCharacters);
         UpdateItemsInInventory();
-        if (battleView != null)
+        battleView.ShowItemsMenu(false);
+        
+        if (activeCharacters[0].IsPlayer)
         {
-            battleView.ShowItemsMenu(false);
-            if (activeCharacters[0].IsPlayer)
-            {
-                CheckAmmoStatus(activeCharacters[0].EquippedRangeWeapon);
-                battleView.UpdateAmmo(activeCharacters[0].EquippedRangeWeapon);
-            }
+            CheckAmmoStatus(activeCharacters[0].EquippedRangeWeapon);
+            battleView.UpdateAmmo(activeCharacters[0].EquippedRangeWeapon);
         }
 
         NextTurn();
@@ -537,7 +518,7 @@ public class BattleManager : MonoBehaviour
     private IEnumerator ScapingTime()
     {
         if (!randomBattle) enemyCollider.enabled = false;
-        if (battleView != null) StartCoroutine(battleView.ShowLog("Intentas escapar y lo logras."));
+        StartCoroutine(battleView.ShowLog("Intentas escapar y lo logras."));
         yield return new WaitForSeconds(2f);
         EndBattle();
         yield return new WaitForSeconds(3f);
